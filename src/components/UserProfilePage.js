@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { User, Calendar, Users, FileText, ArrowLeft } from 'lucide-react';
+import { Calendar, Users, FileText, ArrowLeft } from 'lucide-react';
 import { getUserProfile, getUserReviews, getFollowers, getFollowing, followUser, unfollowUser } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
@@ -265,6 +265,7 @@ function UserProfilePage({ user }) {
 
   useEffect(() => {
     loadProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
 
   const loadProfile = async () => {

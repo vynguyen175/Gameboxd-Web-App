@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './components/Login';
 import Navigation from './components/Navigation';
-import HomePage from './components/HomePage';
 import FeedPage from './components/FeedPage';
 import ReviewPage from './components/ReviewPage';
 import Dashboard from './components/Dashboard';
