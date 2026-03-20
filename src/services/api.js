@@ -20,6 +20,11 @@ export const register = async (username, password, email, fullName) => {
   return response.data;
 };
 
+export const googleLogin = async (credential) => {
+  const response = await api.post('/auth/google', { credential });
+  return response.data;
+};
+
 // Reviews
 export const getAllReviews = async () => {
   const response = await api.get('/reviews');

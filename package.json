@@ -4,12 +4,13 @@
   "description": "Gameboxd - Gaming Social Platform (Web Version)",
   "main": "server.js",
   "scripts": {
-    "start": "set PORT=3001 && react-scripts start",
+    "start": "set PORT=3001&& react-scripts start",
     "build": "react-scripts build",
     "dev": "concurrently \"npm start\" \"cd ../Gameboxd/vgj-backend && node --watch server.js\"",
     "install-all": "npm install && cd ../vgj-backend && npm install"
   },
   "dependencies": {
+    "@react-oauth/google": "^0.13.4",
     "axios": "^1.6.5",
     "lucide-react": "^0.574.0",
     "react": "^18.2.0",

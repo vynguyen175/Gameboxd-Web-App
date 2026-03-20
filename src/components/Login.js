@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Gamepad2 } from 'lucide-react';
-import { login, register } from '../services/api';
+import { GoogleLogin } from '@react-oauth/google';
+import { login, register, googleLogin } from '../services/api';
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -158,6 +159,39 @@ const Button = styled.button`
   }
 `;
 
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--divider);
+  }
+
+  span {
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+`;
+
+const GoogleButtonWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  > div {
+    width: 100% !important;
+  }
+`;
+
 function Login({ onLogin }) {
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [username, setUsername] = useState('');
@@ -172,6 +206,19 @@ function Login({ onLogin }) {
     setMode(newMode);
     setError('');
     setSuccess('');
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+    try {
+      const userData = await googleLogin(credentialResponse.credential);
+      onLogin(userData);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Google login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -271,6 +318,20 @@ function Login({ onLogin }) {
               ? 'ENTER GAMEBOXD'
               : 'CREATE ACCOUNT'}
           </Button>
+
+          <Divider><span>or</span></Divider>
+
+          <GoogleButtonWrapper>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google login failed. Please try again.')}
+              theme="filled_black"
+              size="large"
+              shape="pill"
+              text={mode === 'login' ? 'signin_with' : 'signup_with'}
+              width="100%"
+            />
+          </GoogleButtonWrapper>
         </Form>
       </LoginCard>
     </LoginContainer>
