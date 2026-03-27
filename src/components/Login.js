@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Gamepad2 } from 'lucide-react';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import { login, register, googleLogin } from '../services/api';
-
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -342,17 +340,15 @@ function Login({ onLogin }) {
           <Divider><span>or</span></Divider>
 
           <GoogleButtonWrapper>
-            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => setError('Google login failed. Please try again.')}
-                theme="filled_black"
-                size="large"
-                shape="pill"
-                text={mode === 'login' ? 'signin_with' : 'signup_with'}
-                width="100%"
-              />
-            </GoogleOAuthProvider>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google login failed. Please try again.')}
+              theme="filled_black"
+              size="large"
+              shape="pill"
+              text={mode === 'login' ? 'signin_with' : 'signup_with'}
+              width="100%"
+            />
           </GoogleButtonWrapper>
         </Form>
       </LoginCard>
