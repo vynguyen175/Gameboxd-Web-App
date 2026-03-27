@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { getAllReviews } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
+import ReviewFilters from './ReviewFilters';
 
 const DashboardContainer = styled.div`
   max-width: 1200px;
@@ -87,44 +88,83 @@ const ErrorMessage = styled.div`
   margin: 40px 0;
 `;
 
-const RefreshButton = styled.button`
+const LoadMoreButton = styled.button`
+  display: block;
+  margin: 32px auto 0;
   background: linear-gradient(135deg, #A855F7, #00F0FF);
   border: none;
   border-radius: 12px;
-  padding: 12px 32px;
+  padding: 14px 40px;
   color: white;
   font-weight: 800;
   font-size: 1rem;
-  margin-bottom: 24px;
+  cursor: pointer;
   box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+  transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     box-shadow: 0 0 30px rgba(168, 85, 247, 0.7);
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
   }
 `;
 
 function Dashboard({ user }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const [selectedReview, setSelectedReview] = useState(null);
+  const [filters, setFilters] = useState({});
+  const [cursor, setCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
 
-  const fetchReviews = async () => {
-    setLoading(true);
+  const fetchReviews = useCallback(async (reset = true) => {
+    if (reset) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
     setError('');
     try {
-      const data = await getAllReviews();
-      setReviews(data);
+      const params = {
+        ...filters,
+        limit: 12,
+      };
+      if (!reset && cursor) {
+        params.cursor = cursor;
+      }
+      const data = await getAllReviews(params);
+      const items = data.reviews || data || [];
+      if (reset) {
+        setReviews(Array.isArray(items) ? items : []);
+      } else {
+        setReviews(prev => [...prev, ...(Array.isArray(items) ? items : [])]);
+      }
+      setCursor(data.nextCursor || null);
+      setHasMore(data.hasMore || false);
     } catch (err) {
       setError('Failed to load reviews. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  };
+  }, [filters, cursor]);
 
   useEffect(() => {
-    fetchReviews();
+    setCursor(null);
+    fetchReviews(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
+  const handleFilterChange = useCallback((newFilters) => {
+    setFilters(newFilters);
   }, []);
 
   const handleVoteUpdate = (reviewId, upvotes, downvotes) => {
@@ -162,9 +202,7 @@ function Dashboard({ user }) {
         </StatCard>
       </Stats>
 
-      <RefreshButton onClick={fetchReviews}>
-        Refresh Feed
-      </RefreshButton>
+      <ReviewFilters onChange={handleFilterChange} />
 
       {loading && <LoadingMessage>Loading reviews...</LoadingMessage>}
 
@@ -183,6 +221,12 @@ function Dashboard({ user }) {
           />
         ))}
       </ReviewsGrid>
+
+      {hasMore && !loading && (
+        <LoadMoreButton onClick={() => fetchReviews(false)} disabled={loadingMore}>
+          {loadingMore ? 'Loading...' : 'Load More'}
+        </LoadMoreButton>
+      )}
 
       {selectedReview && (
         <ReviewModal

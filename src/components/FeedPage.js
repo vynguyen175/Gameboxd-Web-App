@@ -200,14 +200,14 @@ function FeedPage({ user }) {
     setPendingFollow(prev => new Set(prev).add(targetUsername));
     try {
       if (following.has(targetUsername)) {
-        await unfollowUser(targetUsername, user.username);
+        await unfollowUser(targetUsername);
         setFollowing(prev => {
           const next = new Set(prev);
           next.delete(targetUsername);
           return next;
         });
       } else {
-        await followUser(targetUsername, user.username);
+        await followUser(targetUsername);
         setFollowing(prev => new Set(prev).add(targetUsername));
       }
       await loadFeed();

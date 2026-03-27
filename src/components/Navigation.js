@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
-import { Gamepad2, Settings, Shield, Sun, Moon, LogOut, ChevronDown } from 'lucide-react';
+import { Gamepad2, Settings, Shield, Sun, Moon, LogOut, ChevronDown, Search, Bell, Mail, List, BookOpen } from 'lucide-react';
+import { getUnreadNotificationCount } from '../services/api';
 
 const Nav = styled.nav`
   background: var(--nav-bg);
@@ -44,6 +45,49 @@ const RightSection = styled.div`
   align-items: center;
   gap: 14px;
   position: relative;
+`;
+
+const IconButton = styled.button`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: transparent;
+  border: 2px solid var(--card-border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+  }
+`;
+
+const NotifBadge = styled.span`
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #EF4444;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
 `;
 
 const UserMenuButton = styled.button`
@@ -235,6 +279,11 @@ const TabBar = styled.div`
   display: flex;
   border-top: 1px solid var(--divider);
   padding: 0 24px;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const Tab = styled(NavLink)`
@@ -246,6 +295,7 @@ const Tab = styled(NavLink)`
   border-bottom: 3px solid transparent;
   transition: all 0.2s ease;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 
   &:hover {
     color: var(--neon-purple);
@@ -262,6 +312,7 @@ function Navigation({ user, onLogout }) {
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const menuRef = useRef(null);
 
   // Close menu when clicking outside
@@ -273,6 +324,21 @@ function Navigation({ user, onLogout }) {
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Poll unread notification count every 30 seconds
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const data = await getUnreadNotificationCount();
+        setUnreadCount(data.count || 0);
+      } catch {
+        // silently fail
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = () => {
@@ -292,6 +358,17 @@ function Navigation({ user, onLogout }) {
           GAMEBOXD
         </Logo>
         <RightSection ref={menuRef}>
+          <IconButton onClick={() => navigate('/search')} title="Search">
+            <Search />
+          </IconButton>
+          <IconButton onClick={() => navigate('/notifications')} title="Notifications">
+            <Bell />
+            {unreadCount > 0 && <NotifBadge>{unreadCount > 99 ? '99+' : unreadCount}</NotifBadge>}
+          </IconButton>
+          <IconButton onClick={() => navigate('/messages')} title="Messages">
+            <Mail />
+          </IconButton>
+
           <UserMenuButton onClick={() => setIsMenuOpen(!isMenuOpen)}>
             <UserAvatar $hasImage={!!user.profilePicture} $image={user.profilePicture}>
               {!user.profilePicture && (user.username?.charAt(0) || 'U')}
@@ -310,6 +387,10 @@ function Navigation({ user, onLogout }) {
               </MenuRole>
             </MenuHeader>
             <MenuItems>
+              <MenuItem onClick={() => { setIsMenuOpen(false); navigate(`/profile/${user.username}`); }}>
+                <Search />
+                <span>My Profile</span>
+              </MenuItem>
               <MenuItem onClick={() => { setIsMenuOpen(false); navigate('/settings'); }}>
                 <Settings />
                 <span>Settings</span>
@@ -339,7 +420,10 @@ function Navigation({ user, onLogout }) {
       <TabBar>
         <Tab to="/home">Home</Tab>
         <Tab to="/feed">Feed</Tab>
-        <Tab to="/review">Review</Tab>
+        <Tab to="/write-review">Review</Tab>
+        <Tab to="/search">Search</Tab>
+        <Tab to="/my-lists">My Lists</Tab>
+        <Tab to="/backlog">Backlog</Tab>
       </TabBar>
     </Nav>
   );

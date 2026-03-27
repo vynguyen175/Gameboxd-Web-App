@@ -258,6 +258,7 @@ function SettingsPage({ user, onUserUpdate }) {
     fullName: user?.fullName || '',
     bio: user?.bio || '',
     profilePhoto: user?.profilePicture || '',
+    dateOfBirth: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -310,11 +311,12 @@ function SettingsPage({ user, onUserUpdate }) {
     setMessage(null);
 
     try {
-      const updatedUser = await updateUserProfile(user.username, {
+      const updatedUser = await updateUserProfile({
         email: formData.email,
         fullName: formData.fullName,
         bio: formData.bio,
         profilePhoto: formData.profilePhoto,
+        dateOfBirth: formData.dateOfBirth || undefined,
       });
 
       // Update the user in parent component and localStorage
@@ -412,6 +414,17 @@ function SettingsPage({ user, onUserUpdate }) {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Enter your email address"
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Date of Birth {!user?.dateOfBirth && <span style={{ color: 'var(--neon-cyan)', fontSize: '0.75rem', fontWeight: 400 }}>(required for age-gated content)</span>}</Label>
+            <Input
+              type="date"
+              name="dateOfBirth"
+              value={formData.dateOfBirth}
+              onChange={handleInputChange}
+              max={new Date().toISOString().split('T')[0]}
             />
           </FormGroup>
 

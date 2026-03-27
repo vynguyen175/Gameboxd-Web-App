@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Gamepad2 } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { login, register, googleLogin } from '../services/api';
+
+const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -198,6 +200,7 @@ function Login({ onLogin }) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -232,12 +235,18 @@ function Login({ onLogin }) {
         const userData = await login(username, password);
         onLogin(userData);
       } else {
-        await register(username, password, email, fullName);
+        if (!dateOfBirth) {
+          setError('Date of birth is required.');
+          setLoading(false);
+          return;
+        }
+        await register(username, password, email, fullName, dateOfBirth);
         setSuccess('Account created! You can now log in.');
         setMode('login');
         setPassword('');
         setEmail('');
         setFullName('');
+        setDateOfBirth('');
       }
     } catch (err) {
       setError(err.response?.data?.error || err.response?.data?.message || 'Something went wrong. Please try again.');
@@ -297,6 +306,17 @@ function Login({ onLogin }) {
                   autoComplete="name"
                 />
               </div>
+              <div>
+                <Input
+                  type="date"
+                  placeholder="Date of Birth"
+                  value={dateOfBirth}
+                  onChange={e => setDateOfBirth(e.target.value)}
+                  required
+                  max={new Date().toISOString().split('T')[0]}
+                  style={{ colorScheme: 'dark' }}
+                />
+              </div>
             </>
           )}
 
@@ -322,15 +342,17 @@ function Login({ onLogin }) {
           <Divider><span>or</span></Divider>
 
           <GoogleButtonWrapper>
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google login failed. Please try again.')}
-              theme="filled_black"
-              size="large"
-              shape="pill"
-              text={mode === 'login' ? 'signin_with' : 'signup_with'}
-              width="100%"
-            />
+            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google login failed. Please try again.')}
+                theme="filled_black"
+                size="large"
+                shape="pill"
+                text={mode === 'login' ? 'signin_with' : 'signup_with'}
+                width="100%"
+              />
+            </GoogleOAuthProvider>
           </GoogleButtonWrapper>
         </Form>
       </LoginCard>

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { voteOnReview, removeVote, getVoteStatus, getComments, addComment, deleteComment } from '../services/api';
-import { X, Gamepad2, ThumbsUp, ThumbsDown, Star, Trash2, Send } from 'lucide-react';
+import {
+  voteOnReview, removeVote, getVoteStatus, getComments, addComment,
+  deleteComment, getReactions, toggleReaction, reportReview, getShareData
+} from '../services/api';
+import { X, Gamepad2, ThumbsUp, ThumbsDown, Star, Trash2, Send, Flag, Share2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Overlay = styled.div`
   position: fixed;
@@ -39,16 +42,9 @@ const Modal = styled.div`
     to { opacity: 1; transform: translateY(0); }
   }
 
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-track {
-    background: var(--deep-space);
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--card-border);
-    border-radius: 4px;
-  }
+  &::-webkit-scrollbar { width: 8px; }
+  &::-webkit-scrollbar-track { background: var(--deep-space); }
+  &::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
 `;
 
 const GameImage = styled.div`
@@ -66,11 +62,7 @@ const GameImage = styled.div`
 const PlaceholderIcon = styled.div`
   opacity: 0.5;
   color: white;
-
-  svg {
-    width: 80px;
-    height: 80px;
-  }
+  svg { width: 80px; height: 80px; }
 `;
 
 const CloseButton = styled.button`
@@ -88,16 +80,8 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-
-  svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.8);
-    transform: scale(1.1);
-  }
+  svg { width: 24px; height: 24px; }
+  &:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
 `;
 
 const Content = styled.div`
@@ -122,10 +106,7 @@ const UserRow = styled.div`
   margin-bottom: 12px;
   border-radius: 12px;
   transition: background 0.2s ease;
-
-  &:hover {
-    background: var(--section-bg);
-  }
+  &:hover { background: var(--section-bg); }
 `;
 
 const Avatar = styled.div`
@@ -186,13 +167,106 @@ const ReviewText = styled.p`
   margin-bottom: 24px;
 `;
 
+// Image Gallery
+const ImageGallery = styled.div`
+  margin-bottom: 24px;
+`;
+
+const GalleryMain = styled.div`
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 10px;
+`;
+
+const GalleryImage = styled.img`
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+`;
+
+const GalleryNav = styled.button`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  ${props => props.$dir === 'left' ? 'left: 8px' : 'right: 8px'};
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  svg { width: 18px; height: 18px; }
+  &:hover { background: rgba(0, 0, 0, 0.8); }
+`;
+
+const GalleryThumbs = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const GalleryThumb = styled.img`
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid ${props => props.$active ? 'var(--neon-purple)' : 'transparent'};
+  opacity: ${props => props.$active ? 1 : 0.6};
+  transition: all 0.2s ease;
+  &:hover { opacity: 1; }
+`;
+
+// Reactions
+const ReactionsBar = styled.div`
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-top: 1px solid var(--divider);
+  margin-bottom: 4px;
+`;
+
+const ReactionBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid ${props => props.$active ? 'var(--neon-purple)' : 'var(--card-border)'};
+  background: ${props => props.$active ? 'rgba(168, 85, 247, 0.15)' : 'transparent'};
+  color: var(--text-primary);
+
+  &:hover {
+    border-color: var(--neon-purple);
+    transform: scale(1.05);
+  }
+`;
+
+const ReactionCount = styled.span`
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+`;
+
 const VoteSection = styled.div`
   display: flex;
   gap: 12px;
   padding: 20px 0;
   border-top: 1px solid var(--divider);
   border-bottom: 1px solid var(--divider);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+  align-items: center;
+  flex-wrap: wrap;
 `;
 
 const VoteButton = styled.button`
@@ -206,40 +280,46 @@ const VoteButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
   border: 2px solid transparent;
-
-  svg {
-    width: 20px;
-    height: 20px;
-  }
+  svg { width: 20px; height: 20px; }
 
   ${props => props.$type === 'up' && `
     background: ${props.$active ? 'rgba(34, 197, 94, 0.2)' : 'var(--tag-bg)'};
     color: ${props.$active ? '#4ADE80' : 'var(--text-secondary)'};
     border-color: ${props.$active ? 'rgba(34, 197, 94, 0.4)' : 'var(--tag-border)'};
-
-    &:hover {
-      background: rgba(34, 197, 94, 0.2);
-      color: #4ADE80;
-      border-color: rgba(34, 197, 94, 0.4);
-    }
+    &:hover { background: rgba(34, 197, 94, 0.2); color: #4ADE80; border-color: rgba(34, 197, 94, 0.4); }
   `}
 
   ${props => props.$type === 'down' && `
     background: ${props.$active ? 'rgba(239, 68, 68, 0.2)' : 'var(--tag-bg)'};
     color: ${props.$active ? '#FCA5A5' : 'var(--text-secondary)'};
     border-color: ${props.$active ? 'rgba(239, 68, 68, 0.4)' : 'var(--tag-border)'};
-
-    &:hover {
-      background: rgba(239, 68, 68, 0.2);
-      color: #FCA5A5;
-      border-color: rgba(239, 68, 68, 0.4);
-    }
+    &:hover { background: rgba(239, 68, 68, 0.2); color: #FCA5A5; border-color: rgba(239, 68, 68, 0.4); }
   `}
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+
+const ActionBtns = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+`;
+
+const SmallBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--tag-bg);
+  border: 1px solid var(--tag-border);
+  color: var(--text-secondary);
+  svg { width: 14px; height: 14px; }
+  &:hover { border-color: var(--neon-purple); color: var(--neon-purple); }
 `;
 
 const CommentsSection = styled.div``;
@@ -265,15 +345,8 @@ const CommentInput = styled.input`
   padding: 12px 16px;
   color: var(--text-primary);
   font-size: 0.95rem;
-
-  &:focus {
-    outline: none;
-    border-color: var(--neon-purple);
-  }
-
-  &::placeholder {
-    color: var(--text-secondary);
-  }
+  &:focus { outline: none; border-color: var(--neon-purple); }
+  &::placeholder { color: var(--text-secondary); }
 `;
 
 const CommentButton = styled.button`
@@ -289,21 +362,9 @@ const CommentButton = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  svg { width: 18px; height: 18px; }
+  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
 `;
 
 const CommentsList = styled.div`
@@ -353,10 +414,7 @@ const CommentUsername = styled.span`
   color: var(--text-primary);
   cursor: pointer;
   transition: color 0.2s ease;
-
-  &:hover {
-    color: var(--neon-purple);
-  }
+  &:hover { color: var(--neon-purple); }
 `;
 
 const CommentTime = styled.span`
@@ -379,16 +437,8 @@ const DeleteButton = styled.button`
   border-radius: 4px;
   display: flex;
   align-items: center;
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  &:hover {
-    color: #EF4444;
-    background: rgba(239, 68, 68, 0.1);
-  }
+  svg { width: 16px; height: 16px; }
+  &:hover { color: #EF4444; background: rgba(239, 68, 68, 0.1); }
 `;
 
 const NoComments = styled.div`
@@ -407,6 +457,105 @@ const OwnReviewNote = styled.div`
   border-radius: 8px;
 `;
 
+// Report Modal
+const ReportOverlay = styled.div`
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 20px;
+`;
+
+const ReportCard = styled.div`
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+`;
+
+const ReportTitle = styled.h3`
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+`;
+
+const ReportOption = styled.button`
+  width: 100%;
+  padding: 12px 16px;
+  background: ${props => props.$active ? 'rgba(168, 85, 247, 0.15)' : 'transparent'};
+  border: 2px solid ${props => props.$active ? 'var(--neon-purple)' : 'var(--card-border)'};
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  &:hover { border-color: var(--neon-purple); }
+`;
+
+const ReportButtons = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+`;
+
+const ReportBtn = styled.button`
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  ${props => props.$primary ? `
+    background: #EF4444;
+    border: none;
+    color: white;
+    &:hover { background: #DC2626; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  ` : `
+    background: transparent;
+    border: 2px solid var(--card-border);
+    color: var(--text-secondary);
+    &:hover { border-color: var(--text-primary); color: var(--text-primary); }
+  `}
+`;
+
+const CopiedToast = styled.div`
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(34, 197, 94, 0.9);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  z-index: 1200;
+`;
+
+const REACTION_EMOJIS = [
+  { emoji: '🔥', label: 'fire' },
+  { emoji: '❤️', label: 'heart' },
+  { emoji: '🤔', label: 'thinking' },
+  { emoji: '😂', label: 'laugh' },
+  { emoji: '😢', label: 'sad' },
+  { emoji: '🤯', label: 'mind_blown' },
+  { emoji: '🏆', label: 'trophy' },
+];
+
+const REPORT_REASONS = ['Spam', 'Inappropriate content', 'Harassment', 'Spoilers without warning', 'Off-topic', 'Other'];
+
 function ReviewModal({ review, user, onClose, onVoteUpdate }) {
   const navigate = useNavigate();
   const [voteStatus, setVoteStatus] = useState({ hasVoted: false, voteType: null });
@@ -417,8 +566,16 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loadingComments, setLoadingComments] = useState(true);
+  const [reactions, setReactions] = useState({});
+  const [myReactions, setMyReactions] = useState([]);
+  const [showReport, setShowReport] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reporting, setReporting] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
 
-  const isOwnReview = review.username === user.username;
+  const isOwnReview = review.username === user?.username;
+  const images = review.images || [];
 
   const goToProfile = (username) => {
     onClose();
@@ -427,7 +584,6 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
 
   useEffect(() => {
     fetchData();
-    // Close on escape key
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();
     };
@@ -438,12 +594,21 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
 
   const fetchData = async () => {
     try {
-      const [voteData, commentsData] = await Promise.all([
-        !isOwnReview ? getVoteStatus(review._id, user.username) : Promise.resolve({ hasVoted: false, voteType: null }),
+      const promises = [
         getComments(review._id),
-      ]);
-      setVoteStatus(voteData);
+        getReactions(review._id).catch(() => ({ reactions: {}, userReactions: [] })),
+      ];
+      if (!isOwnReview && user) {
+        promises.push(getVoteStatus(review._id, user.username));
+      } else {
+        promises.push(Promise.resolve({ hasVoted: false, voteType: null }));
+      }
+
+      const [commentsData, reactionsData, voteData] = await Promise.all(promises);
       setComments(commentsData);
+      setReactions(reactionsData.reactions || reactionsData || {});
+      setMyReactions(reactionsData.userReactions || []);
+      setVoteStatus(voteData);
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {
@@ -457,14 +622,12 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
 
     try {
       if (voteStatus.hasVoted && voteStatus.voteType === voteType) {
-        // Remove vote
-        const result = await removeVote(review._id, user.username);
+        const result = await removeVote(review._id);
         setVoteStatus({ hasVoted: false, voteType: null });
         setUpvotes(result.upvoteCount);
         setDownvotes(result.downvoteCount);
       } else {
-        // Add or change vote
-        const result = await voteOnReview(review._id, user.username, voteType);
+        const result = await voteOnReview(review._id, voteType);
         setVoteStatus({ hasVoted: true, voteType });
         setUpvotes(result.upvoteCount);
         setDownvotes(result.downvoteCount);
@@ -479,13 +642,23 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
     }
   };
 
+  const handleReaction = async (emoji) => {
+    try {
+      const result = await toggleReaction(review._id, emoji);
+      setReactions(result.reactions || {});
+      setMyReactions(result.userReactions || []);
+    } catch (err) {
+      console.error('Reaction error:', err);
+    }
+  };
+
   const handleSubmitComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim() || submitting) return;
 
     setSubmitting(true);
     try {
-      const comment = await addComment(review._id, user.username, newComment.trim());
+      const comment = await addComment(review._id, newComment.trim());
       setComments([comment, ...comments]);
       setNewComment('');
     } catch (err) {
@@ -497,10 +670,38 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteComment(review._id, commentId, user.username);
+      await deleteComment(review._id, commentId);
       setComments(comments.filter(c => c._id !== commentId));
     } catch (err) {
       console.error('Delete comment error:', err);
+    }
+  };
+
+  const handleReport = async () => {
+    if (!reportReason) return;
+    setReporting(true);
+    try {
+      await reportReview(review._id, { reason: reportReason });
+      setShowReport(false);
+      setReportReason('');
+    } catch (err) {
+      console.error('Report error:', err);
+    } finally {
+      setReporting(false);
+    }
+  };
+
+  const handleShare = () => {
+    const url = `${window.location.origin}/review/${review._id}`;
+    if (navigator.share) {
+      navigator.share({
+        title: `${review.gameTitle} - Review by ${review.username}`,
+        url,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -509,7 +710,6 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
-
     if (minutes < 1) return 'just now';
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
@@ -519,9 +719,7 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <StarIcon key={i} $filled={i <= Math.round(rating)} />
-      );
+      stars.push(<StarIcon key={i} $filled={i <= Math.round(rating)} />);
     }
     return stars;
   };
@@ -530,14 +728,8 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
     <Overlay onClick={onClose}>
       <Modal onClick={e => e.stopPropagation()}>
         <GameImage $image={review.gameImageUrl}>
-          {!review.gameImageUrl && (
-            <PlaceholderIcon>
-              <Gamepad2 />
-            </PlaceholderIcon>
-          )}
-          <CloseButton onClick={onClose}>
-            <X />
-          </CloseButton>
+          {!review.gameImageUrl && <PlaceholderIcon><Gamepad2 /></PlaceholderIcon>}
+          <CloseButton onClick={onClose}><X /></CloseButton>
         </GameImage>
 
         <Content>
@@ -557,6 +749,58 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
           </RatingRow>
 
           <ReviewText>{review.reviewText}</ReviewText>
+
+          {/* Image Gallery */}
+          {images.length > 0 && (
+            <ImageGallery>
+              <GalleryMain>
+                <GalleryImage src={images[galleryIndex]} alt={`Screenshot ${galleryIndex + 1}`} />
+                {images.length > 1 && (
+                  <>
+                    <GalleryNav
+                      $dir="left"
+                      onClick={() => setGalleryIndex(i => (i - 1 + images.length) % images.length)}
+                    >
+                      <ChevronLeft />
+                    </GalleryNav>
+                    <GalleryNav
+                      $dir="right"
+                      onClick={() => setGalleryIndex(i => (i + 1) % images.length)}
+                    >
+                      <ChevronRight />
+                    </GalleryNav>
+                  </>
+                )}
+              </GalleryMain>
+              {images.length > 1 && (
+                <GalleryThumbs>
+                  {images.map((img, i) => (
+                    <GalleryThumb
+                      key={i}
+                      src={img}
+                      alt={`Thumb ${i + 1}`}
+                      $active={i === galleryIndex}
+                      onClick={() => setGalleryIndex(i)}
+                    />
+                  ))}
+                </GalleryThumbs>
+              )}
+            </ImageGallery>
+          )}
+
+          {/* Emoji Reactions */}
+          <ReactionsBar>
+            {REACTION_EMOJIS.map(({ emoji, label }) => (
+              <ReactionBtn
+                key={label}
+                $active={myReactions.includes(label)}
+                onClick={() => handleReaction(label)}
+              >
+                {emoji}
+                {(reactions[label] || 0) > 0 && <ReactionCount>{reactions[label]}</ReactionCount>}
+              </ReactionBtn>
+            ))}
+          </ReactionsBar>
 
           <VoteSection>
             {isOwnReview ? (
@@ -583,6 +827,13 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
                 </VoteButton>
               </>
             )}
+
+            <ActionBtns>
+              <SmallBtn onClick={handleShare}><Share2 /> Share</SmallBtn>
+              {!isOwnReview && (
+                <SmallBtn onClick={() => setShowReport(true)}><Flag /> Report</SmallBtn>
+              )}
+            </ActionBtns>
           </VoteSection>
 
           <CommentsSection>
@@ -597,8 +848,7 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
                 maxLength={500}
               />
               <CommentButton type="submit" disabled={submitting || !newComment.trim()}>
-                <Send />
-                <span>Post</span>
+                <Send /><span>Post</span>
               </CommentButton>
             </CommentForm>
 
@@ -616,7 +866,7 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
                         <CommentUsername onClick={() => goToProfile(comment.username)}>{comment.username}</CommentUsername>
                         <CommentTime>{formatTime(comment.timestamp)}</CommentTime>
                       </CommentUser>
-                      {comment.username === user.username && (
+                      {comment.username === user?.username && (
                         <DeleteButton onClick={() => handleDeleteComment(comment._id)}>
                           <Trash2 />
                         </DeleteButton>
@@ -630,6 +880,32 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
           </CommentsSection>
         </Content>
       </Modal>
+
+      {/* Report Modal */}
+      {showReport && (
+        <ReportOverlay onClick={() => setShowReport(false)}>
+          <ReportCard onClick={e => e.stopPropagation()}>
+            <ReportTitle>Report Review</ReportTitle>
+            {REPORT_REASONS.map(reason => (
+              <ReportOption
+                key={reason}
+                $active={reportReason === reason}
+                onClick={() => setReportReason(reason)}
+              >
+                {reason}
+              </ReportOption>
+            ))}
+            <ReportButtons>
+              <ReportBtn onClick={() => setShowReport(false)}>Cancel</ReportBtn>
+              <ReportBtn $primary onClick={handleReport} disabled={!reportReason || reporting}>
+                {reporting ? 'Reporting...' : 'Submit Report'}
+              </ReportBtn>
+            </ReportButtons>
+          </ReportCard>
+        </ReportOverlay>
+      )}
+
+      {copied && <CopiedToast>Link copied to clipboard!</CopiedToast>}
     </Overlay>
   );
 }

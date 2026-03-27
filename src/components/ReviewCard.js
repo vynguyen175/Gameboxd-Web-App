@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Gamepad2, ThumbsUp, ThumbsDown, MessageCircle, Star } from 'lucide-react';
+import { Gamepad2, ThumbsUp, ThumbsDown, MessageCircle, Star, Image } from 'lucide-react';
 
 const Card = styled.div`
   background: var(--card-bg);
@@ -169,12 +169,67 @@ const ClickHint = styled.div`
   font-size: 0.75rem;
 `;
 
+const GenreTag = styled.span`
+  display: inline-block;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: #C084FC;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 8px;
+`;
+
+const TagRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+`;
+
+const ImageBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: var(--neon-cyan);
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  svg { width: 12px; height: 12px; }
+`;
+
+const TopReactions = styled.div`
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+`;
+
+const ReactionPill = styled.span`
+  background: var(--tag-bg);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+`;
+
 function ReviewCard({ review, onClick }) {
   const navigate = useNavigate();
 
   const handleUsernameClick = (e) => {
     e.stopPropagation();
     navigate(`/profile/${review.username}`);
+  };
+
+  const handleGameTitleClick = (e) => {
+    if (review.igdbGameId) {
+      e.stopPropagation();
+      navigate(`/game/${review.igdbGameId}`);
+    }
   };
 
   const getTimeAgo = (timestamp) => {
@@ -212,7 +267,12 @@ function ReviewCard({ review, onClick }) {
       </GameImage>
 
       <CardContent>
-        <GameTitle>{review.gameTitle}</GameTitle>
+        <GameTitle
+          onClick={handleGameTitleClick}
+          style={review.igdbGameId ? { cursor: 'pointer' } : {}}
+        >
+          {review.gameTitle}
+        </GameTitle>
 
         <UserInfo>
           <Avatar>{review.username.charAt(0).toUpperCase()}</Avatar>
@@ -228,6 +288,19 @@ function ReviewCard({ review, onClick }) {
         </Rating>
 
         <ReviewText>{review.reviewText}</ReviewText>
+        <TagRow>
+          {review.genre && <GenreTag>{review.genre}</GenreTag>}
+          {review.images && review.images.length > 0 && (
+            <ImageBadge><Image /> {review.images.length}</ImageBadge>
+          )}
+        </TagRow>
+        {review.topReactions && Object.keys(review.topReactions).length > 0 && (
+          <TopReactions>
+            {Object.entries(review.topReactions).slice(0, 3).map(([emoji, count]) => (
+              <ReactionPill key={emoji}>{emoji} {count}</ReactionPill>
+            ))}
+          </TopReactions>
+        )}
       </CardContent>
 
       <CardFooter>

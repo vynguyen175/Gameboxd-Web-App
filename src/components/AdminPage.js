@@ -9,6 +9,8 @@ import {
   adminBanUser,
   adminUnbanUser,
   adminCreateUser,
+  getAdminReports,
+  resolveReport,
 } from '../services/api';
 
 const PageContainer = styled.div`
@@ -461,6 +463,53 @@ const CreateButton = styled.button`
   }
 `;
 
+const ReportCard = styled.div`
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--neon-purple);
+  }
+`;
+
+const ReportHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+`;
+
+const ReportReason = styled.div`
+  font-weight: 700;
+  color: #FCA5A5;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+`;
+
+const ReportMeta = styled.div`
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+`;
+
+const ReportContent = styled.div`
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 12px;
+  background: var(--section-bg);
+  border-radius: 8px;
+  margin-bottom: 12px;
+`;
+
+const ReportActions = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
 const USER_COLUMNS = '2fr 1fr 1fr 1fr 2fr';
 const REVIEW_COLUMNS = '2fr 2fr 0.8fr 1fr 1.5fr';
 
@@ -468,6 +517,7 @@ function AdminPage({ user }) {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -483,16 +533,28 @@ function AdminPage({ user }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [usersData, reviewsData] = await Promise.all([
+      const [usersData, reviewsData, reportsData] = await Promise.all([
         getAdminUsers(user.username),
         getAdminReviews(user.username),
+        getAdminReports(user.username).catch(() => []),
       ]);
       setUsers(usersData);
       setReviews(reviewsData);
+      setReports(reportsData || []);
     } catch (err) {
       setMessage({ type: 'error', text: 'Failed to load data' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResolveReport = async (reportId, status) => {
+    try {
+      await resolveReport(reportId, status, user.username);
+      setReports(reports.map(r => r._id === reportId ? { ...r, status } : r));
+      setMessage({ type: 'success', text: `Report ${status}` });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Failed to resolve report' });
     }
   };
 
@@ -642,9 +704,12 @@ function AdminPage({ user }) {
         <Tab $active={activeTab === 'reviews'} onClick={() => { setActiveTab('reviews'); setSearchTerm(''); }}>
           Reviews
         </Tab>
+        <Tab $active={activeTab === 'reports'} onClick={() => { setActiveTab('reports'); setSearchTerm(''); }}>
+          Reports ({reports.filter(r => r.status === 'pending' || !r.status).length})
+        </Tab>
       </TabsContainer>
 
-      <Card>
+      {(activeTab === 'users' || activeTab === 'reviews') && <Card>
         <CardHeader>
           <CardTitle>
             {activeTab === 'users' ? `Users (${filteredUsers.length})` : `Reviews (${filteredReviews.length})`}
@@ -768,7 +833,49 @@ function AdminPage({ user }) {
             )}
           </Table>
         )}
-      </Card>
+      </Card>}
+
+      {activeTab === 'reports' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Flagged Reviews ({reports.length})</CardTitle>
+          </CardHeader>
+          {reports.length === 0 ? (
+            <EmptyState>No reports</EmptyState>
+          ) : (
+            <div style={{ padding: '16px 24px' }}>
+              {reports.map(report => (
+                <ReportCard key={report._id}>
+                  <ReportHeader>
+                    <div>
+                      <ReportReason>Reason: {report.reason}</ReportReason>
+                      <ReportMeta>
+                        Reported by {report.reportedBy || 'unknown'} &bull;{' '}
+                        {new Date(report.createdAt).toLocaleDateString()} &bull;{' '}
+                        Status: {report.status || 'pending'}
+                      </ReportMeta>
+                    </div>
+                  </ReportHeader>
+                  <ReportContent>
+                    <strong>{report.reviewGameTitle || 'Review'}</strong>
+                    {report.reviewText && <div style={{ marginTop: 8 }}>{report.reviewText}</div>}
+                  </ReportContent>
+                  {(!report.status || report.status === 'pending') && (
+                    <ReportActions>
+                      <ActionButton $variant="danger" onClick={() => handleResolveReport(report._id, 'resolved')}>
+                        Remove Content
+                      </ActionButton>
+                      <ActionButton $variant="success" onClick={() => handleResolveReport(report._id, 'dismissed')}>
+                        Dismiss
+                      </ActionButton>
+                    </ReportActions>
+                  )}
+                </ReportCard>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
 
       {showCreateModal && (
         <Modal onClick={() => setShowCreateModal(false)}>
