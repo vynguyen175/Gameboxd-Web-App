@@ -20,6 +20,7 @@ import NotificationsPage from './components/NotificationsPage';
 import MessagesPage from './components/MessagesPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import SharedReviewPage from './components/SharedReviewPage';
+import DateOfBirthPrompt from './components/DateOfBirthPrompt';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -97,6 +98,9 @@ function App() {
     <ThemeProvider>
       <Router>
         <AppContainer>
+          {user && !user.dateOfBirth && (
+            <DateOfBirthPrompt user={user} onComplete={handleUserUpdate} />
+          )}
           {user && <Navigation user={user} onLogout={handleLogout} />}
           <Routes>
             {/* Public routes */}
