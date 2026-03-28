@@ -365,74 +365,55 @@ export const markConversationRead = async (conversationId) => {
 };
 
 // ─── Admin ──────────────────────────────────────────────────────────────────
+// Admin auth is handled server-side via JWT token (no extra headers needed)
 
-export const getAdminUsers = async (adminUsername) => {
-  const response = await api.get('/admin/users', {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const getAdminUsers = async () => {
+  const response = await api.get('/admin/users');
   return response.data;
 };
 
-export const getAdminReviews = async (adminUsername) => {
-  const response = await api.get('/admin/reviews', {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const getAdminReviews = async () => {
+  const response = await api.get('/admin/reviews');
   return response.data;
 };
 
-export const adminDeleteReview = async (reviewId, adminUsername) => {
-  const response = await api.delete(`/admin/reviews/${reviewId}`, {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const adminDeleteReview = async (reviewId) => {
+  const response = await api.delete(`/admin/reviews/${reviewId}`);
   return response.data;
 };
 
-export const adminDeleteUser = async (username, adminUsername) => {
-  const response = await api.delete(`/admin/users/${username}`, {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const adminDeleteUser = async (username) => {
+  const response = await api.delete(`/admin/users/${username}`);
   return response.data;
 };
 
-export const adminPromoteUser = async (username, adminUsername) => {
-  const response = await api.post(`/admin/users/${username}/promote`, {}, {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const adminPromoteUser = async (username) => {
+  const response = await api.post(`/admin/users/${username}/promote`);
   return response.data;
 };
 
-export const adminBanUser = async (username, adminUsername) => {
-  const response = await api.post(`/admin/users/${username}/ban`, {}, {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const adminBanUser = async (username) => {
+  const response = await api.post(`/admin/users/${username}/ban`);
   return response.data;
 };
 
-export const adminUnbanUser = async (username, adminUsername) => {
-  const response = await api.post(`/admin/users/${username}/unban`, {}, {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const adminUnbanUser = async (username) => {
+  const response = await api.post(`/admin/users/${username}/unban`);
   return response.data;
 };
 
-export const adminCreateUser = async (userData, adminUsername) => {
-  const response = await api.post('/admin/users', userData, {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const adminCreateUser = async (userData) => {
+  const response = await api.post('/admin/users', userData);
   return response.data;
 };
 
-export const getAdminReports = async (adminUsername) => {
-  const response = await api.get('/admin/reports', {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const getAdminReports = async () => {
+  const response = await api.get('/admin/reports');
   return response.data;
 };
 
-export const resolveReport = async (reportId, status, adminUsername) => {
-  const response = await api.put(`/admin/reports/${reportId}`, { status }, {
-    headers: { 'x-admin-username': adminUsername }
-  });
+export const resolveReport = async (reportId, status) => {
+  const response = await api.put(`/admin/reports/${reportId}`, { status });
   return response.data;
 };
 

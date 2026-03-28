@@ -534,9 +534,9 @@ function AdminPage({ user }) {
     setLoading(true);
     try {
       const [usersData, reviewsData, reportsData] = await Promise.all([
-        getAdminUsers(user.username),
-        getAdminReviews(user.username),
-        getAdminReports(user.username).catch(() => []),
+        getAdminUsers(),
+        getAdminReviews(),
+        getAdminReports().catch(() => []),
       ]);
       setUsers(usersData);
       setReviews(reviewsData);
@@ -550,7 +550,7 @@ function AdminPage({ user }) {
 
   const handleResolveReport = async (reportId, status) => {
     try {
-      await resolveReport(reportId, status, user.username);
+      await resolveReport(reportId, status);
       setReports(reports.map(r => r._id === reportId ? { ...r, status } : r));
       setMessage({ type: 'success', text: `Report ${status}` });
     } catch (err) {
@@ -562,7 +562,7 @@ function AdminPage({ user }) {
     if (!window.confirm('Are you sure you want to delete this review?')) return;
 
     try {
-      await adminDeleteReview(reviewId, user.username);
+      await adminDeleteReview(reviewId);
       setReviews(reviews.filter(r => r._id !== reviewId));
       setMessage({ type: 'success', text: 'Review deleted successfully' });
     } catch (err) {
@@ -574,7 +574,7 @@ function AdminPage({ user }) {
     if (!window.confirm(`Are you sure you want to delete user "${username}" and all their reviews?`)) return;
 
     try {
-      await adminDeleteUser(username, user.username);
+      await adminDeleteUser(username);
       setUsers(users.filter(u => u.username !== username));
       setReviews(reviews.filter(r => r.username !== username));
       setMessage({ type: 'success', text: `User "${username}" deleted successfully` });
@@ -587,7 +587,7 @@ function AdminPage({ user }) {
     if (!window.confirm(`Promote "${username}" to admin?`)) return;
 
     try {
-      await adminPromoteUser(username, user.username);
+      await adminPromoteUser(username);
       setUsers(users.map(u => u.username === username ? { ...u, role: 'admin' } : u));
       setMessage({ type: 'success', text: `User "${username}" promoted to admin` });
     } catch (err) {
@@ -599,7 +599,7 @@ function AdminPage({ user }) {
     if (!window.confirm(`Ban user "${username}"?`)) return;
 
     try {
-      await adminBanUser(username, user.username);
+      await adminBanUser(username);
       setUsers(users.map(u => u.username === username ? { ...u, isBanned: true } : u));
       setMessage({ type: 'success', text: `User "${username}" has been banned` });
     } catch (err) {
@@ -609,7 +609,7 @@ function AdminPage({ user }) {
 
   const handleUnbanUser = async (username) => {
     try {
-      await adminUnbanUser(username, user.username);
+      await adminUnbanUser(username);
       setUsers(users.map(u => u.username === username ? { ...u, isBanned: false } : u));
       setMessage({ type: 'success', text: `User "${username}" has been unbanned` });
     } catch (err) {
@@ -626,7 +626,7 @@ function AdminPage({ user }) {
 
     setCreating(true);
     try {
-      const created = await adminCreateUser(newUser, user.username);
+      const created = await adminCreateUser(newUser);
       setUsers([...users, created]);
       setShowCreateModal(false);
       setNewUser({ username: '', password: '', email: '', role: 'user' });

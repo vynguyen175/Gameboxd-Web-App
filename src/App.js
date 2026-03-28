@@ -45,11 +45,8 @@ function App() {
           localStorage.removeItem('gameboxd_user');
         }
       } else {
-        // Fallback: try loading from localStorage
-        const savedUser = localStorage.getItem('gameboxd_user');
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
-        }
+        // No token = not authenticated. Clear any stale user data.
+        localStorage.removeItem('gameboxd_user');
       }
       setLoading(false);
     };
