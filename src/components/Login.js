@@ -347,7 +347,9 @@ function Login({ onLogin }) {
               size="large"
               shape="pill"
               text={mode === 'login' ? 'signin_with' : 'signup_with'}
-              width="100%"
+              width="360"
+              type="standard"
+              logo_alignment="center"
             />
           </GoogleButtonWrapper>
         </Form>
