@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   voteOnReview, removeVote, getVoteStatus, getComments, addComment,
-  deleteComment, getReactions, toggleReaction, reportReview, getShareData
+  deleteComment, getReactions, toggleReaction, reportReview
 } from '../services/api';
-import { X, Gamepad2, ThumbsUp, ThumbsDown, Star, Trash2, Send, Flag, Share2, Copy, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Gamepad2, ThumbsUp, ThumbsDown, Star, Trash2, Send, Flag, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Overlay = styled.div`
   position: fixed;

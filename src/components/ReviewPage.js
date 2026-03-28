@@ -1,15 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
-import { createReview, getUserReviews, deleteReview, getTrendingGames, uploadImage, getGenres, searchGames } from '../services/api';
+import { createReview, getUserReviews, deleteReview, uploadImage, getGenres, searchGames } from '../services/api';
 import { X, Search, Image } from 'lucide-react';
-
-const FALLBACK_GAMES = [
-  'Elden Ring', 'The Legend of Zelda: BOTW', 'Hollow Knight',
-  'Stardew Valley', 'God of War', "Baldur's Gate 3",
-  'The Witcher 3', 'Sekiro: Shadows Die Twice', 'Hades',
-  'Celeste', 'Cyberpunk 2077', 'Red Dead Redemption 2',
-  'Minecraft', 'Dark Souls 3', 'Ghost of Tsushima',
-];
 
 const Container = styled.div`
   max-width: 800px;
@@ -472,7 +464,6 @@ const GenreBadge = styled.span`
 const MAX_SCREENSHOTS = 5;
 
 function ReviewPage({ user }) {
-  const [games, setGames] = useState(FALLBACK_GAMES);
   const [selectedGame, setSelectedGame] = useState('');
   const [selectedIgdbGame, setSelectedIgdbGame] = useState(null);
   const [rating, setRating] = useState(0);
@@ -488,7 +479,7 @@ function ReviewPage({ user }) {
   const [screenshots, setScreenshots] = useState([]); // { file, preview }
   const [searchResults, setSearchResults] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [searchingGames, setSearchingGames] = useState(false);
+  const [, setSearchingGames] = useState(false);
   const searchTimeout = useRef(null);
   const fileInputRef = useRef(null);
   const screenshotInputRef = useRef(null);
@@ -518,16 +509,6 @@ function ReviewPage({ user }) {
   }, [user.username]);
 
   useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        const data = await getTrendingGames();
-        if (data && data.length > 0) {
-          const apiGames = data.map(g => g.title);
-          const merged = [...new Set([...apiGames, ...FALLBACK_GAMES])];
-          setGames(merged);
-        }
-      } catch { /* keep FALLBACK_GAMES */ }
-    };
     const fetchGenres = async () => {
       try {
         const data = await getGenres();
@@ -542,7 +523,6 @@ function ReviewPage({ user }) {
         setGenreList(['Action', 'Adventure', 'RPG', 'Strategy', 'Simulation', 'Sports', 'Racing', 'Puzzle', 'Platformer', 'Fighting', 'Shooter', 'Open World', 'Indie', 'MMO', 'Casual', 'Horror', 'Survival', 'Visual Novel']);
       }
     };
-    fetchGames();
     fetchGenres();
     loadMyReviews();
   }, [loadMyReviews, isMinor]);

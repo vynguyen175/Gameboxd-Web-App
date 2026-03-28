@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
-import { Gamepad2, Settings, Shield, Sun, Moon, LogOut, ChevronDown, Search, Bell, Mail, List, BookOpen } from 'lucide-react';
+import { Gamepad2, Settings, Shield, Sun, Moon, LogOut, ChevronDown, Search, Bell, Mail } from 'lucide-react';
 import { getUnreadNotificationCount } from '../services/api';
 
 const Nav = styled.nav`

@@ -445,7 +445,6 @@ function UserProfilePage({ user }) {
       setIsFollowing(myFollowingData.includes(username));
 
       // Check mutual follow
-      const theyFollowMe = followersData.includes(user.username) || followingData.includes(user.username);
       const iFollowThem = myFollowingData.includes(username);
       // Mutual: they follow me AND I follow them
       const targetFollowersOfMe = await getFollowers(user.username).catch(() => []);
@@ -515,7 +514,7 @@ function UserProfilePage({ user }) {
 
   const handleMessage = async () => {
     try {
-      const conv = await startConversation(username);
+      await startConversation(username);
       navigate('/messages');
     } catch (err) {
       console.error('Start conversation error:', err);

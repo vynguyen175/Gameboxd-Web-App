@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Send, MessageCircle, User } from 'lucide-react';
 import {
-  getConversations, startConversation, getMessages,
+  getConversations, getMessages,
   sendMessage, markConversationRead
 } from '../services/api';
 
