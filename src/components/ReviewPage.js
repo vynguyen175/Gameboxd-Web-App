@@ -502,7 +502,7 @@ function ReviewPage({ user }) {
   const loadMyReviews = useCallback(async () => {
     try {
       const data = await getUserReviews(user.username);
-      setMyReviews(data);
+      setMyReviews(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Load reviews error:', err);
     }

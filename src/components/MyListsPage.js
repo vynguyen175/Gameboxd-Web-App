@@ -234,7 +234,7 @@ function MyListsPage({ user }) {
     const fetchLists = async () => {
       try {
         const data = await getUserLists(user.username);
-        setLists(data);
+        setLists(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error(err);
       } finally {

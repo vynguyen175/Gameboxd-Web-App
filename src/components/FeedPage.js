@@ -169,7 +169,7 @@ function FeedPage({ user }) {
     setLoadingFeed(true);
     try {
       const data = await getFeed(user.username);
-      setFeed(data);
+      setFeed(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Feed error:', err);
     } finally {

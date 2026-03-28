@@ -325,8 +325,8 @@ function GameListPage({ user }) {
       setLoading(true);
       try {
         const data = await getList(id);
-        setList(data);
-        setEditForm({ title: data.title, description: data.description || '', isPublic: data.isPublic !== false });
+        setList(data && typeof data === 'object' ? data : null);
+        if (data) setEditForm({ title: data.title, description: data.description || '', isPublic: data.isPublic !== false });
       } catch (err) {
         console.error(err);
       } finally {
