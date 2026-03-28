@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Search, Gamepad2, User, FileText, Star } from 'lucide-react';
 import { searchAll } from '../services/api';
 import ReviewModal from './ReviewModal';
+import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const Container = styled.div`
   max-width: 900px;
@@ -191,6 +192,7 @@ const LoadingState = styled.div`
 
 function SearchPage({ user }) {
   const navigate = useNavigate();
+  const { filterMatureContent } = useAgeRestriction(user);
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('games');
   const [results, setResults] = useState([]);
@@ -224,6 +226,8 @@ function SearchPage({ user }) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [query, activeTab, doSearch]);
+
+  const filteredResults = activeTab === 'reviews' ? filterMatureContent(results) : results;
 
   const handleResultClick = (result) => {
     if (activeTab === 'games') {
@@ -276,13 +280,13 @@ function SearchPage({ user }) {
 
       {loading && <LoadingState>Searching...</LoadingState>}
 
-      {!loading && query.trim().length >= 2 && results.length === 0 && (
+      {!loading && query.trim().length >= 2 && filteredResults.length === 0 && (
         <EmptyState>No {activeTab} found for "{query}"</EmptyState>
       )}
 
       {!loading && (
         <ResultsList>
-          {results.map((result, idx) => (
+          {filteredResults.map((result, idx) => (
             <ResultCard key={result._id || result.id || idx} onClick={() => handleResultClick(result)}>
               <ResultImage $image={result.cover || result.gameImageUrl || result.profilePicture}>
                 {!(result.cover || result.gameImageUrl || result.profilePicture) && (

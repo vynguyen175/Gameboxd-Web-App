@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { User, Inbox } from 'lucide-react';
 import { getAllUsers, getFollowing, followUser, unfollowUser, getFeed } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
+import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const Container = styled.div`
   max-width: 900px;
@@ -157,6 +158,7 @@ const LoadingText = styled.div`
 
 function FeedPage({ user }) {
   const navigate = useNavigate();
+  const { filterMatureContent } = useAgeRestriction(user);
   const [allUsers, setAllUsers] = useState([]);
   const [following, setFollowing] = useState(new Set());
   const [feed, setFeed] = useState([]);
@@ -221,6 +223,8 @@ function FeedPage({ user }) {
       });
     }
   };
+
+  const filteredFeed = useMemo(() => filterMatureContent(feed), [feed, filterMatureContent]);
 
   const handleVoteUpdate = (reviewId, upvotes, downvotes) => {
     setFeed(feed.map(r =>
@@ -289,7 +293,7 @@ function FeedPage({ user }) {
 
         {loadingFeed ? (
           <LoadingText>Loading feed...</LoadingText>
-        ) : feed.length === 0 ? (
+        ) : filteredFeed.length === 0 ? (
           <EmptyState>
             <EmptyIcon><Inbox /></EmptyIcon>
             <EmptyText>
@@ -300,7 +304,7 @@ function FeedPage({ user }) {
           </EmptyState>
         ) : (
           <ReviewsGrid>
-            {feed.map(review => (
+            {filteredFeed.map(review => (
               <ReviewCard
                 key={review._id}
                 review={review}

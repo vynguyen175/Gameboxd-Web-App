@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { getAllReviews } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
 import ReviewFilters from './ReviewFilters';
+import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const DashboardContainer = styled.div`
   max-width: 1200px;
@@ -115,6 +116,7 @@ const LoadMoreButton = styled.button`
 `;
 
 function Dashboard({ user }) {
+  const { filterMatureContent } = useAgeRestriction(user);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -175,10 +177,12 @@ function Dashboard({ user }) {
     ));
   };
 
+  const filteredReviews = useMemo(() => filterMatureContent(reviews), [reviews, filterMatureContent]);
+
   // Calculate stats
-  const totalReviews = reviews.length;
-  const uniqueGames = new Set(reviews.map(r => r.gameTitle)).size;
-  const totalVotes = reviews.reduce((sum, r) => sum + (r.upvoteCount || 0) + (r.downvoteCount || 0), 0);
+  const totalReviews = filteredReviews.length;
+  const uniqueGames = new Set(filteredReviews.map(r => r.gameTitle)).size;
+  const totalVotes = filteredReviews.reduce((sum, r) => sum + (r.upvoteCount || 0) + (r.downvoteCount || 0), 0);
 
   return (
     <DashboardContainer className="animate-slide-in">
@@ -208,12 +212,12 @@ function Dashboard({ user }) {
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {!loading && !error && reviews.length === 0 && (
+      {!loading && !error && filteredReviews.length === 0 && (
         <LoadingMessage>No reviews yet. Be the first to add one!</LoadingMessage>
       )}
 
       <ReviewsGrid>
-        {reviews.map((review) => (
+        {filteredReviews.map((review) => (
           <ReviewCard
             key={review._id}
             review={review}

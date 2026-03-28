@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowLeft, Star, Gamepad2, Plus, ChevronDown } from 'lucide-react';
@@ -8,6 +8,7 @@ import {
 } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
+import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -357,6 +358,7 @@ const STATUS_LABELS = {
 function GamePage({ user }) {
   const { igdbId } = useParams();
   const navigate = useNavigate();
+  const { filterMatureContent } = useAgeRestriction(user);
   const [game, setGame] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -458,6 +460,8 @@ function GamePage({ user }) {
       console.error('Add to list error:', err);
     }
   };
+
+  const filteredReviews = useMemo(() => filterMatureContent(reviews), [reviews, filterMatureContent]);
 
   if (loading) {
     return <Container><LoadingState>Loading game...</LoadingState></Container>;
@@ -567,11 +571,11 @@ function GamePage({ user }) {
         </div>
       </SortRow>
 
-      {reviews.length === 0 && !reviewsLoading ? (
+      {filteredReviews.length === 0 && !reviewsLoading ? (
         <EmptyState>No reviews yet. Be the first to review this game!</EmptyState>
       ) : (
         <ReviewsGrid>
-          {reviews.map(review => (
+          {filteredReviews.map(review => (
             <ReviewCard
               key={review._id}
               review={review}
