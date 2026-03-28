@@ -2,23 +2,23 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Gamepad2, ThumbsUp, ThumbsDown, MessageCircle, Star, Image } from 'lucide-react';
+import useTilt from '../hooks/useTilt';
 
 const Card = styled.div`
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  border: 2px solid var(--card-border);
-  border-radius: 20px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-depth-1);
   cursor: pointer;
+  will-change: transform;
+  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 
   &:hover {
-    transform: translateY(-6px);
-    box-shadow:
-      0 0 30px var(--glow-purple),
-      0 12px 40px rgba(0, 0, 0, 0.4);
-    border-color: var(--neon-purple);
+    box-shadow: var(--shadow-depth-3), 0 0 30px var(--glow-purple);
+    border-color: rgba(168, 85, 247, 0.3);
   }
 `;
 
@@ -31,6 +31,18 @@ const GameImage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+    pointer-events: none;
+  }
 `;
 
 const PlaceholderIcon = styled.div`
@@ -45,6 +57,7 @@ const PlaceholderIcon = styled.div`
 
 const CardContent = styled.div`
   padding: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 `;
 
 const GameTitle = styled.h3`
@@ -76,6 +89,7 @@ const Avatar = styled.div`
   font-weight: 700;
   font-size: 0.85rem;
   color: white;
+  transition: box-shadow var(--transition-fast);
 `;
 
 const UserDetails = styled.div`
@@ -145,8 +159,10 @@ const CardFooter = styled.div`
   align-items: center;
   gap: 16px;
   padding: 12px 18px;
-  border-top: 1px solid var(--divider);
-  background: var(--section-bg);
+  border-top: 1px solid var(--glass-border);
+  background: rgba(10, 10, 15, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 `;
 
 const Stat = styled.div`
@@ -219,6 +235,7 @@ const ReactionPill = styled.span`
 
 function ReviewCard({ review, onClick }) {
   const navigate = useNavigate();
+  const tiltRef = useTilt({ maxTilt: 6, scale: 1.02 });
 
   const handleUsernameClick = (e) => {
     e.stopPropagation();
@@ -257,7 +274,7 @@ function ReviewCard({ review, onClick }) {
   };
 
   return (
-    <Card onClick={onClick}>
+    <Card ref={tiltRef} onClick={onClick}>
       <GameImage $image={review.gameImageUrl}>
         {!review.gameImageUrl && (
           <PlaceholderIcon>

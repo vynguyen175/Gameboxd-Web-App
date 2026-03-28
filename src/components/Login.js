@@ -10,29 +10,40 @@ const LoginContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
+  background: radial-gradient(ellipse at 30% 30%, rgba(168, 85, 247, 0.15), transparent 60%),
+              radial-gradient(ellipse at 70% 70%, rgba(0, 240, 255, 0.1), transparent 60%);
 `;
 
 const LoginCard = styled.div`
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
-  border-radius: 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
   padding: 48px 40px;
   width: 100%;
   max-width: 440px;
-  box-shadow: 0 0 40px var(--glow-purple), 0 16px 48px rgba(0, 0, 0, 0.4);
-  animation: slideInUp 0.5s ease-out;
+  box-shadow: var(--shadow-depth-3), 0 0 60px var(--glow-purple);
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   transition: background 0.3s ease, border-color 0.3s ease;
+
+  @media (max-width: 480px) {
+    padding: 32px 24px;
+    border-radius: 24px;
+  }
 `;
 
 const IconWrapper = styled.div`
   text-align: center;
   margin-bottom: 16px;
-  animation: pulse 3s infinite;
+  animation: float 3s ease-in-out infinite;
   color: var(--neon-purple);
 
   svg {
     width: 64px;
     height: 64px;
+    filter: drop-shadow(0 0 20px var(--glow-purple));
   }
 `;
 
@@ -56,17 +67,19 @@ const Subtitle = styled.p`
 
 const TabRow = styled.div`
   display: flex;
-  background: var(--section-bg);
-  border-radius: 12px;
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
   padding: 4px;
   margin-bottom: 24px;
-  border: 1px solid var(--divider);
+  border: 1px solid var(--glass-border);
 `;
 
 const ModeTab = styled.button`
   flex: 1;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 700;
   background: ${props => props.$active
@@ -74,11 +87,12 @@ const ModeTab = styled.button`
     : 'transparent'};
   color: ${props => props.$active ? 'white' : 'var(--text-secondary)'};
   border: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: ${props => props.$active ? '0 0 16px var(--glow-purple)' : 'none'};
+  transform: ${props => props.$active ? 'scale(1.02)' : 'scale(1)'};
 
   &:hover {
-    transform: none;
+    transform: ${props => props.$active ? 'scale(1.02)' : 'scale(1.01)'};
     color: ${props => props.$active ? 'white' : 'var(--text-primary)'};
   }
 `;
@@ -92,14 +106,16 @@ const Form = styled.form`
 const Input = styled.input`
   width: 100%;
   padding: 14px 16px;
-  background: var(--input-bg);
-  border: 2px solid var(--input-border);
-  border-radius: 12px;
+  background: rgba(10, 10, 15, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
   color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &::placeholder {
     color: var(--text-tertiary);
@@ -108,6 +124,7 @@ const Input = styled.input`
   &:focus {
     border-color: var(--input-border-focus);
     box-shadow: 0 0 0 3px var(--glow-purple);
+    transform: scale(1.01);
   }
 `;
 
@@ -138,18 +155,22 @@ const Button = styled.button`
   padding: 14px;
   background: linear-gradient(135deg, var(--button-primary-start), var(--button-primary-end));
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   color: white;
   font-size: 1rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   box-shadow: 0 0 24px var(--glow-purple);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   margin-top: 4px;
 
   &:hover:not(:disabled) {
     box-shadow: 0 0 36px var(--glow-purple);
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
   }
 
   &:disabled {

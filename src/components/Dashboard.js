@@ -23,6 +23,7 @@ const Title = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 8px;
+  filter: drop-shadow(0 2px 8px rgba(168, 85, 247, 0.3));
 `;
 
 const Subtitle = styled.p`
@@ -39,12 +40,21 @@ const Stats = styled.div`
 `;
 
 const StatCard = styled.div`
-  background: var(--stat-card-bg);
-  border: 2px solid var(--card-border);
-  border-radius: 16px;
-  padding: 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 28px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-depth-1);
+  transition: all var(--transition-normal);
+
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-depth-2), 0 0 20px var(--glow-cyan);
+    border-color: rgba(0, 240, 255, 0.2);
+  }
 `;
 
 const StatValue = styled.div`
@@ -53,6 +63,7 @@ const StatValue = styled.div`
   color: var(--neon-cyan);
   margin-bottom: 8px;
   text-shadow: 0 0 20px var(--glow-cyan);
+  font-variant-numeric: tabular-nums;
 `;
 
 const StatLabel = styled.div`
@@ -94,18 +105,24 @@ const LoadMoreButton = styled.button`
   margin: 32px auto 0;
   background: linear-gradient(135deg, #A855F7, #00F0FF);
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px 40px;
   color: white;
   font-weight: 800;
   font-size: 1rem;
   cursor: pointer;
   box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
   &:hover:not(:disabled) {
     box-shadow: 0 0 30px rgba(168, 85, 247, 0.7);
-    transform: translateY(-2px);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
   }
 
   &:disabled {

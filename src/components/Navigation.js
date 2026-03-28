@@ -6,13 +6,14 @@ import { Gamepad2, Settings, Shield, Sun, Moon, LogOut, ChevronDown, Search, Bel
 import { getUnreadNotificationCount } from '../services/api';
 
 const Nav = styled.nav`
-  background: var(--nav-bg);
-  backdrop-filter: blur(12px);
-  border-bottom: 2px solid var(--nav-border);
+  background: rgba(10, 10, 15, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   transition: background 0.3s ease, border-color 0.3s ease;
 `;
 
@@ -54,12 +55,14 @@ const IconButton = styled.button`
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  background: transparent;
-  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 
   svg {
     width: 18px;
@@ -69,6 +72,12 @@ const IconButton = styled.button`
   &:hover {
     border-color: var(--neon-purple);
     color: var(--neon-purple);
+    transform: scale(1.08);
+    box-shadow: 0 0 16px var(--glow-purple);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
@@ -88,6 +97,8 @@ const NotifBadge = styled.span`
   justify-content: center;
   padding: 0 4px;
   line-height: 1;
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
 `;
 
 const UserMenuButton = styled.button`
@@ -146,16 +157,18 @@ const DropdownMenu = styled.div`
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
-  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
   min-width: 220px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-depth-3);
   overflow: hidden;
   opacity: ${props => props.$isOpen ? 1 : 0};
   visibility: ${props => props.$isOpen ? 'visible' : 'hidden'};
-  transform: ${props => props.$isOpen ? 'translateY(0)' : 'translateY(-10px)'};
-  transition: all 0.2s ease;
+  transform: ${props => props.$isOpen ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(0.95)'};
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 200;
 `;
 
@@ -293,7 +306,7 @@ const Tab = styled(NavLink)`
   color: var(--text-secondary);
   text-decoration: none;
   border-bottom: 3px solid transparent;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   letter-spacing: 0.04em;
   white-space: nowrap;
 
@@ -305,6 +318,7 @@ const Tab = styled(NavLink)`
   &.active {
     color: var(--neon-purple);
     border-bottom-color: var(--neon-purple);
+    box-shadow: 0 2px 8px var(--glow-purple);
   }
 `;
 

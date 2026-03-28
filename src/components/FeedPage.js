@@ -42,19 +42,22 @@ const SectionSub = styled.p`
 `;
 
 const FriendRow = styled.div`
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
-  border-radius: 14px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
   padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 
   &:hover {
-    border-color: var(--neon-purple);
-    box-shadow: 0 4px 16px var(--glow-purple);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-depth-2), 0 0 16px var(--glow-purple);
+    border-color: rgba(168, 85, 247, 0.3);
   }
 `;
 
@@ -77,6 +80,11 @@ const Avatar = styled.div`
   color: white;
   box-shadow: 0 0 12px var(--glow-purple);
   flex-shrink: 0;
+  transition: box-shadow var(--transition-fast);
+
+  ${FriendRow}:hover & {
+    box-shadow: 0 0 0 3px var(--neon-purple), 0 0 16px var(--glow-purple);
+  }
 `;
 
 const FriendName = styled.span`
@@ -107,7 +115,7 @@ const FollowBtn = styled.button`
     ? 'rgba(239,68,68,0.1)'
     : 'linear-gradient(135deg, var(--button-primary-start), var(--button-primary-end))'};
   color: ${props => props.$following ? '#FCA5A5' : 'white'};
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
   min-width: 100px;
 
   &:hover {
