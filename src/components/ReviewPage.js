@@ -594,6 +594,7 @@ function ReviewPage({ user }) {
     e.preventDefault();
     if (!selectedGame.trim()) return showToast('Please enter a game name!', true);
     if (rating === 0) return showToast('Please give a rating!', true);
+    if (!selectedGenre) return showToast('Please select a genre!', true);
     if (reviewText.trim().length < 10) return showToast('Review must be at least 10 characters.', true);
 
     setSubmitting(true);
