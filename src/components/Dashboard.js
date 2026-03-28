@@ -44,16 +44,22 @@ const StatCard = styled.div`
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
   padding: 28px;
   text-align: center;
-  box-shadow: var(--shadow-depth-1);
+  box-shadow: var(--shadow-depth-1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all var(--transition-normal);
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+  &:nth-child(3) { animation-delay: 0.15s; }
 
   &:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: var(--shadow-depth-2), 0 0 20px var(--glow-cyan);
-    border-color: rgba(0, 240, 255, 0.2);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: var(--shadow-depth-3), 0 0 40px var(--glow-cyan), 0 0 80px rgba(0, 240, 255, 0.1);
+    border-color: rgba(0, 240, 255, 0.3);
   }
 `;
 

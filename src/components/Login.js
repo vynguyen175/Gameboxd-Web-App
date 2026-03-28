@@ -10,27 +10,29 @@ const LoginContainer = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background: radial-gradient(ellipse at 30% 30%, rgba(168, 85, 247, 0.15), transparent 60%),
-              radial-gradient(ellipse at 70% 70%, rgba(0, 240, 255, 0.1), transparent 60%);
+  background: radial-gradient(ellipse at 30% 30%, rgba(168, 85, 247, 0.2), transparent 50%),
+              radial-gradient(ellipse at 70% 70%, rgba(0, 240, 255, 0.15), transparent 50%),
+              radial-gradient(ellipse at 50% 90%, rgba(255, 16, 240, 0.08), transparent 40%);
 `;
 
 const LoginCard = styled.div`
-  background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 28px;
+  background: rgba(15, 15, 20, 0.4);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 32px;
   padding: 48px 40px;
   width: 100%;
   max-width: 440px;
-  box-shadow: var(--shadow-depth-3), 0 0 60px var(--glow-purple);
-  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-depth-3), 0 0 80px var(--glow-purple), 0 0 120px rgba(0, 240, 255, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   transition: background 0.3s ease, border-color 0.3s ease;
 
   @media (max-width: 480px) {
     padding: 32px 24px;
-    border-radius: 24px;
+    border-radius: 28px;
   }
 `;
 

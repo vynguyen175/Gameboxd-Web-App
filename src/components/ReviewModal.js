@@ -13,38 +13,65 @@ const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
+  padding: 0;
   animation: fadeIn 0.2s ease;
 
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
+
+  @media (min-width: 768px) {
+    align-items: center;
+    padding: 20px;
+  }
 `;
 
 const Modal = styled.div`
-  background: var(--card-bg);
-  border: 2px solid var(--card-border);
-  border-radius: 20px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 28px 28px 0 0;
   max-width: 700px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 92vh;
   overflow-y: auto;
-  animation: slideUp 0.3s ease;
+  animation: slideInFromBottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5), 0 0 60px var(--glow-purple);
 
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  &::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
+
+  @media (min-width: 768px) {
+    border-radius: 28px;
+    max-height: 85vh;
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--shadow-depth-3), 0 0 60px var(--glow-purple);
+
+    &::before {
+      display: none;
+    }
   }
 
   &::-webkit-scrollbar { width: 8px; }
-  &::-webkit-scrollbar-track { background: var(--deep-space); }
-  &::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
 `;
 
 const GameImage = styled.div`

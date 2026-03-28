@@ -9,16 +9,17 @@ const Card = styled.div`
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: var(--shadow-depth-1);
+  box-shadow: var(--shadow-depth-1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   cursor: pointer;
   will-change: transform;
-  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 
   &:hover {
-    box-shadow: var(--shadow-depth-3), 0 0 30px var(--glow-purple);
-    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: var(--shadow-depth-3), 0 0 40px var(--glow-purple), 0 0 80px rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.4);
   }
 `;
 

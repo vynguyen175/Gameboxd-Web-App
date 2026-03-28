@@ -6,14 +6,14 @@ import { Gamepad2, Settings, Shield, Sun, Moon, LogOut, ChevronDown, Search, Bel
 import { getUnreadNotificationCount } from '../services/api';
 
 const Nav = styled.nav`
-  background: rgba(10, 10, 15, 0.75);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--glass-border);
+  background: rgba(10, 10, 15, 0.65);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 60px rgba(168, 85, 247, 0.05);
   transition: background 0.3s ease, border-color 0.3s ease;
 `;
 

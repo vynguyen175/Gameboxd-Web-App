@@ -48,9 +48,9 @@
   --bg-overlay: radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.08), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(0, 240, 255, 0.05), transparent 50%);
 
   /* Glassmorphism */
-  --glass-bg: rgba(20, 20, 25, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: 20px;
+  --glass-bg: rgba(20, 20, 30, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-blur: 24px;
 
   /* Layered Shadows */
   --shadow-depth-1: 0 4px 16px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -140,6 +140,26 @@ body::before {
   background: var(--bg-overlay);
   pointer-events: none;
   z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 40%, rgba(168, 85, 247, 0.06) 0%, transparent 40%),
+              radial-gradient(circle at 70% 60%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+              radial-gradient(circle at 50% 80%, rgba(255, 16, 240, 0.03) 0%, transparent 30%);
+  animation: ambientFloat 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.light-mode::after {
+  background: radial-gradient(circle at 30% 40%, rgba(124, 58, 237, 0.04) 0%, transparent 40%),
+              radial-gradient(circle at 70% 60%, rgba(8, 145, 178, 0.03) 0%, transparent 40%);
 }
 
 #root {
@@ -247,6 +267,13 @@ button:active {
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
+}
+
+@keyframes ambientFloat {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2%, -2%) rotate(1deg); }
+  66% { transform: translate(-1%, 1%) rotate(-1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
 }
 
 .animate-slide-in {
