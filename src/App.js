@@ -29,8 +29,16 @@ const AppContainer = styled.div`
 `;
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Load cached user immediately to avoid redirect flash
+  const [user, setUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem('gameboxd_user');
+      const token = localStorage.getItem('gameboxd_token');
+      if (cached && token) return JSON.parse(cached);
+    } catch {}
+    return null;
+  });
+  const [loading, setLoading] = useState(!user);
 
   useEffect(() => {
     const initAuth = async () => {
@@ -41,13 +49,17 @@ function App() {
           setUser(userData);
           localStorage.setItem('gameboxd_user', JSON.stringify(userData));
         } catch (err) {
-          // Token invalid, clear it
-          localStorage.removeItem('gameboxd_token');
-          localStorage.removeItem('gameboxd_user');
+          // Only clear if it's a real 401, not a network error
+          if (err.response && err.response.status === 401) {
+            localStorage.removeItem('gameboxd_token');
+            localStorage.removeItem('gameboxd_user');
+            setUser(null);
+          }
+          // On network errors, keep using cached user
         }
       } else {
-        // No token = not authenticated. Clear any stale user data.
         localStorage.removeItem('gameboxd_user');
+        setUser(null);
       }
       setLoading(false);
     };
