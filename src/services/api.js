@@ -173,7 +173,7 @@ export const getTrendingGames = async () => {
 };
 
 export const searchGames = async (query) => {
-  const response = await api.get('/games/search', { params: { query } });
+  const response = await api.get('/games/search', { params: { q: query } });
   return response.data;
 };
 
