@@ -140,8 +140,8 @@ function DateOfBirthPrompt({ user, onComplete }) {
     setLoading(true);
     setError('');
     try {
-      const updated = await updateUserProfile({ dateOfBirth });
-      onComplete(updated.user || updated);
+      const updated = await updateUserProfile({ username: user.username, dateOfBirth });
+      onComplete(updated || user);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to save. Please try again.');
     } finally {

@@ -235,6 +235,7 @@ export const getUserProfile = async (username) => {
 
 export const updateUserProfile = async (profileData) => {
   const response = await api.put('/auth/profile', {
+    username: profileData.username,
     fullName: profileData.fullName,
     email: profileData.email,
     bio: profileData.bio,

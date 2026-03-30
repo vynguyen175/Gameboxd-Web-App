@@ -312,6 +312,7 @@ function SettingsPage({ user, onUserUpdate }) {
 
     try {
       const updatedUser = await updateUserProfile({
+        username: user.username,
         email: formData.email,
         fullName: formData.fullName,
         bio: formData.bio,
