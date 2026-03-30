@@ -141,7 +141,8 @@ function DateOfBirthPrompt({ user, onComplete }) {
     setError('');
     try {
       const updated = await updateUserProfile({ username: user.username, dateOfBirth });
-      onComplete(updated || user);
+      // Merge dateOfBirth into user data even if backend returns partial data
+      onComplete({ ...user, dateOfBirth, ...(updated || {}) });
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to save. Please try again.');
     } finally {
