@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Gamepad2 } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
@@ -33,6 +33,27 @@ const floatIcon = keyframes`
   75% { transform: translateY(-4px) rotate(-1deg); }
 `;
 
+const orbFloat1 = keyframes`
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(80px, -120px) scale(1.2); }
+  66% { transform: translate(-60px, -60px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
+`;
+
+const orbFloat2 = keyframes`
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-100px, 80px) scale(1.1); }
+  66% { transform: translate(70px, 40px) scale(0.85); }
+  100% { transform: translate(0, 0) scale(1); }
+`;
+
+const orbFloat3 = keyframes`
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, 100px) scale(1.15); }
+  66% { transform: translate(-80px, -80px) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+`;
+
 // ─── Styled Components ──────────────────────────────────────────────────────
 
 const PageWrapper = styled.div`
@@ -42,78 +63,76 @@ const PageWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #050510;
 `;
 
-const VideoBg = styled.video`
+const AnimatedBg = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   z-index: 0;
+  overflow: hidden;
+`;
+
+const Orb = styled.div`
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
   opacity: 0.5;
 `;
 
-const AnimatedGradientBg = styled.div`
+const Orb1 = styled(Orb)`
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.4), transparent 70%);
+  top: -10%;
+  left: -5%;
+  animation: ${orbFloat1} 12s ease-in-out infinite;
+`;
+
+const Orb2 = styled(Orb)`
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.3), transparent 70%);
+  bottom: -5%;
+  right: -5%;
+  animation: ${orbFloat2} 15s ease-in-out infinite;
+`;
+
+const Orb3 = styled(Orb)`
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(255, 16, 240, 0.25), transparent 70%);
+  top: 50%;
+  left: 50%;
+  margin-left: -175px;
+  margin-top: -175px;
+  animation: ${orbFloat3} 18s ease-in-out infinite;
+`;
+
+const GridOverlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
-  background: linear-gradient(
-    -45deg,
-    #0a0a0f,
-    #1a0530,
-    #0a1628,
-    #0f0a1a,
-    #001a1a,
-    #1a0030
-  );
-  background-size: 400% 400%;
-  animation: ${gradientMove} 15s ease infinite;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-      radial-gradient(ellipse at 20% 30%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 70%, rgba(0, 240, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 100%, rgba(255, 16, 240, 0.08) 0%, transparent 40%);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background:
-      radial-gradient(circle at 30% 40%, rgba(168, 85, 247, 0.05) 0%, transparent 30%),
-      radial-gradient(circle at 70% 60%, rgba(0, 240, 255, 0.04) 0%, transparent 30%);
-    animation: ${gradientMove} 20s ease-in-out infinite reverse;
-  }
+  background-image:
+    linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: 1;
 `;
 
-const VideoOverlay = styled.div`
+const ParticleCanvas = styled.canvas`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(10, 5, 20, 0.6) 40%,
-    rgba(10, 5, 20, 0.8) 100%
-  );
+  pointer-events: none;
 `;
 
 const ContentWrapper = styled.div`
@@ -159,7 +178,7 @@ const HeroTitle = styled.h1`
 
 const HeroSubtitle = styled.p`
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 400;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -168,7 +187,7 @@ const HeroSubtitle = styled.p`
 
 const LoginCard = styled.div`
   width: 100%;
-  background: rgba(12, 12, 18, 0.45);
+  background: rgba(10, 10, 18, 0.5);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -336,15 +355,85 @@ const GoogleButtonWrapper = styled.div`
 
 const FooterText = styled.p`
   text-align: center;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.15);
   font-size: 0.75rem;
   margin-top: 24px;
   animation: ${fadeUp} 0.8s ease-out 0.6s both;
   letter-spacing: 0.05em;
 `;
 
-// ─── Video URL (free Pixabay gaming/neon video) ─────────────────────────────
-const VIDEO_URL = 'https://cdn.pixabay.com/video/2020/11/03/54794-478008325_large.mp4';
+// ─── Particle System ────────────────────────────────────────────────────────
+
+function useParticles(canvasRef) {
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+    let particles = [];
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const PARTICLE_COUNT = 60;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2 + 0.5,
+        speedX: (Math.random() - 0.5) * 0.4,
+        speedY: (Math.random() - 0.5) * 0.4,
+        opacity: Math.random() * 0.5 + 0.1,
+        color: Math.random() > 0.5 ? '168, 85, 247' : '0, 240, 255',
+      });
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p, i) => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.color}, ${p.opacity})`;
+        ctx.fill();
+
+        // Draw connections
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(168, 85, 247, ${0.08 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      });
+
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+    };
+  }, [canvasRef]);
+}
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -358,7 +447,9 @@ function Login({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const canvasRef = useRef(null);
+
+  useParticles(canvasRef);
 
   const switchMode = (newMode) => {
     setMode(newMode);
@@ -412,23 +503,16 @@ function Login({ onLogin }) {
 
   return (
     <PageWrapper>
-      {/* Animated gradient background (always visible, acts as fallback) */}
-      <AnimatedGradientBg />
+      {/* Animated background with floating orbs */}
+      <AnimatedBg>
+        <Orb1 />
+        <Orb2 />
+        <Orb3 />
+        <GridOverlay />
+      </AnimatedBg>
 
-      {/* Video background */}
-      <VideoBg
-        autoPlay
-        loop
-        muted
-        playsInline
-        onCanPlay={() => setVideoLoaded(true)}
-        style={{ opacity: videoLoaded ? 0.35 : 0 }}
-      >
-        <source src={VIDEO_URL} type="video/mp4" />
-      </VideoBg>
-
-      {/* Dark gradient overlay for readability */}
-      <VideoOverlay />
+      {/* Floating particles with connections */}
+      <ParticleCanvas ref={canvasRef} />
 
       {/* Content */}
       <ContentWrapper>
