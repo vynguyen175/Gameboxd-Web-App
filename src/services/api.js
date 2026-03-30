@@ -190,8 +190,21 @@ export const getGameReviews = async (igdbId, params = {}) => {
 // ─── Search ─────────────────────────────────────────────────────────────────
 
 export const searchAll = async (query, type) => {
-  const response = await api.get('/search', { params: { query, type } });
-  return response.data;
+  if (type === 'games') {
+    const response = await api.get('/games/search', { params: { q: query } });
+    return { results: response.data };
+  } else if (type === 'users') {
+    const response = await api.get('/users');
+    const filtered = (response.data || []).filter(u =>
+      u.username?.toLowerCase().includes(query.toLowerCase())
+    );
+    return { results: filtered };
+  } else if (type === 'reviews') {
+    const response = await api.get('/reviews', { params: { search: query } });
+    const items = response.data.reviews || response.data || [];
+    return { results: Array.isArray(items) ? items : [] };
+  }
+  return { results: [] };
 };
 
 // ─── Users & Follow ─────────────────────────────────────────────────────────
