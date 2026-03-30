@@ -8,6 +8,7 @@ import {
 } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
+import LoadingSpinner from './LoadingSpinner';
 import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const Container = styled.div`
@@ -331,13 +332,6 @@ const WriteReviewBtn = styled.button`
   }
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--neon-purple);
-  font-size: 1.1rem;
-`;
-
 const EmptyState = styled.div`
   text-align: center;
   padding: 60px 20px;
@@ -464,7 +458,7 @@ function GamePage({ user }) {
   const filteredReviews = useMemo(() => filterMatureContent(reviews), [reviews, filterMatureContent]);
 
   if (loading) {
-    return <Container><LoadingState>Loading game...</LoadingState></Container>;
+    return <Container><LoadingSpinner text="Loading game" /></Container>;
   }
 
   if (!game) {

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowLeft, Trash2, Edit3, Lock, Unlock, Gamepad2 } from 'lucide-react';
 import { getList, updateList, removeGameFromList, deleteList } from '../services/api';
+import LoadingSpinner from './LoadingSpinner';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -186,13 +187,6 @@ const EmptyState = styled.div`
   border-radius: 16px;
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--neon-purple);
-  font-size: 1.1rem;
-`;
-
 const EditModal = styled.div`
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -368,7 +362,7 @@ function GameListPage({ user }) {
     }
   };
 
-  if (loading) return <Container><LoadingState>Loading list...</LoadingState></Container>;
+  if (loading) return <Container><LoadingSpinner text="Loading list" /></Container>;
   if (!list) return <Container><BackButton onClick={() => navigate(-1)}><ArrowLeft /> Go Back</BackButton><EmptyState>List not found</EmptyState></Container>;
 
   return (

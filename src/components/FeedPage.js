@@ -5,6 +5,7 @@ import { User, Inbox } from 'lucide-react';
 import { getAllUsers, getFollowing, followUser, unfollowUser, getFeed } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
+import LoadingSpinner from './LoadingSpinner';
 import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const Container = styled.div`
@@ -158,12 +159,6 @@ const EmptyText = styled.p`
   font-size: 0.95rem;
 `;
 
-const LoadingText = styled.div`
-  text-align: center;
-  color: var(--text-tertiary);
-  padding: 20px;
-`;
-
 function FeedPage({ user }) {
   const navigate = useNavigate();
   const { filterMatureContent } = useAgeRestriction(user);
@@ -254,7 +249,7 @@ function FeedPage({ user }) {
         </SectionHeader>
 
         {loadingUsers ? (
-          <LoadingText>Loading users...</LoadingText>
+          <LoadingSpinner text="Loading users" compact />
         ) : allUsers.length === 0 ? (
           <EmptyState>
             <EmptyIcon><User /></EmptyIcon>
@@ -300,7 +295,7 @@ function FeedPage({ user }) {
         </SectionHeader>
 
         {loadingFeed ? (
-          <LoadingText>Loading feed...</LoadingText>
+          <LoadingSpinner text="Loading feed" compact />
         ) : filteredFeed.length === 0 ? (
           <EmptyState>
             <EmptyIcon><Inbox /></EmptyIcon>

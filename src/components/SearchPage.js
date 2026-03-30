@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Search, Gamepad2, User, FileText, Star } from 'lucide-react';
 import { searchAll } from '../services/api';
 import ReviewModal from './ReviewModal';
+import LoadingSpinner from './LoadingSpinner';
 import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const Container = styled.div`
@@ -183,13 +184,6 @@ const EmptyState = styled.div`
   border-radius: 16px;
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--neon-purple);
-  font-size: 1.1rem;
-`;
-
 function SearchPage({ user }) {
   const navigate = useNavigate();
   const { filterMatureContent } = useAgeRestriction(user);
@@ -278,7 +272,7 @@ function SearchPage({ user }) {
         </Tab>
       </Tabs>
 
-      {loading && <LoadingState>Searching...</LoadingState>}
+      {loading && <LoadingSpinner text="Searching" compact />}
 
       {!loading && query.trim().length >= 2 && filteredResults.length === 0 && (
         <EmptyState>No {activeTab} found for "{query}"</EmptyState>

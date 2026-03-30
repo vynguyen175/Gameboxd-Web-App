@@ -12,6 +12,7 @@ import {
   getAdminReports,
   resolveReport,
 } from '../services/api';
+import LoadingSpinner from './LoadingSpinner';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -730,7 +731,7 @@ function AdminPage({ user }) {
         </CardHeader>
 
         {loading ? (
-          <EmptyState>Loading...</EmptyState>
+          <LoadingSpinner text="Loading" />
         ) : activeTab === 'users' ? (
           <Table>
             <TableHeader $columns={USER_COLUMNS}>

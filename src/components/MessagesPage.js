@@ -5,6 +5,7 @@ import {
   getConversations, getMessages,
   sendMessage, markConversationRead
 } from '../services/api';
+import LoadingSpinner from './LoadingSpinner';
 
 const Container = styled.div`
   max-width: 1100px;
@@ -323,7 +324,7 @@ function MessagesPage({ user }) {
         <ConversationList>
           <ConvHeader>Conversations</ConvHeader>
           {loading ? (
-            <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>Loading...</div>
+            <LoadingSpinner text="Loading" compact />
           ) : conversations.length === 0 ? (
             <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>
               No conversations yet. Start one from a user's profile!

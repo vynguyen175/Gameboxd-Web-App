@@ -4,6 +4,7 @@ import { getAllReviews } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
 import ReviewFilters from './ReviewFilters';
+import LoadingSpinner from './LoadingSpinner';
 import useAgeRestriction from '../hooks/useAgeRestriction';
 
 const DashboardContainer = styled.div`
@@ -231,7 +232,7 @@ function Dashboard({ user }) {
 
       <ReviewFilters onChange={handleFilterChange} />
 
-      {loading && <LoadingMessage>Loading reviews...</LoadingMessage>}
+      {loading && <LoadingSpinner text="Loading reviews" />}
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 

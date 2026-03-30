@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Plus, List, Gamepad2, Lock, Unlock } from 'lucide-react';
 import { getUserLists, createList } from '../services/api';
+import LoadingSpinner from './LoadingSpinner';
 
 const Container = styled.div`
   max-width: 1000px;
@@ -117,13 +118,6 @@ const EmptyIcon = styled.div`
   margin-bottom: 16px;
   color: var(--text-tertiary);
   svg { width: 48px; height: 48px; }
-`;
-
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--neon-purple);
-  font-size: 1.1rem;
 `;
 
 const Modal = styled.div`
@@ -259,7 +253,7 @@ function MyListsPage({ user }) {
     }
   };
 
-  if (loading) return <Container><LoadingState>Loading lists...</LoadingState></Container>;
+  if (loading) return <Container><LoadingSpinner text="Loading lists" /></Container>;
 
   return (
     <Container>

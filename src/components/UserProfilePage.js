@@ -9,6 +9,7 @@ import {
 } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
+import LoadingSpinner from './LoadingSpinner';
 
 const PageContainer = styled.div`
   max-width: 900px;
@@ -384,13 +385,6 @@ const EmptyIcon = styled.div`
   svg { width: 48px; height: 48px; }
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--neon-purple);
-  font-size: 1.1rem;
-`;
-
 const ErrorState = styled.div`
   text-align: center;
   padding: 60px 20px;
@@ -546,7 +540,7 @@ function UserProfilePage({ user }) {
   };
 
   if (loading) {
-    return <PageContainer><LoadingState>Loading profile...</LoadingState></PageContainer>;
+    return <PageContainer><LoadingSpinner text="Loading profile" /></PageContainer>;
   }
 
   if (error || !profile) {

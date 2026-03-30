@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Bell, UserPlus, MessageCircle, ThumbsUp, Trophy, Mail, CheckCheck } from 'lucide-react';
 import { getNotifications, markNotificationRead, markAllNotificationsRead } from '../services/api';
+import LoadingSpinner from './LoadingSpinner';
 
 const Container = styled.div`
   max-width: 700px;
@@ -174,13 +175,6 @@ const LoadMoreBtn = styled.button`
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--neon-purple);
-  font-size: 1.1rem;
-`;
-
 const ICON_MAP = {
   follow: UserPlus,
   comment: MessageCircle,
@@ -276,7 +270,7 @@ function NotificationsPage() {
     return new Date(timestamp).toLocaleDateString();
   };
 
-  if (loading) return <Container><LoadingState>Loading notifications...</LoadingState></Container>;
+  if (loading) return <Container><LoadingSpinner text="Loading notifications" /></Container>;
 
   return (
     <Container>

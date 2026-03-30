@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Gamepad2, X, ChevronDown } from 'lucide-react';
 import { getUserGameStatuses, setGameStatus, removeGameStatus } from '../services/api';
+import LoadingSpinner from './LoadingSpinner';
 
 const Container = styled.div`
   max-width: 1100px;
@@ -191,13 +192,6 @@ const EmptyState = styled.div`
   border-radius: 16px;
 `;
 
-const LoadingState = styled.div`
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--neon-purple);
-  font-size: 1.1rem;
-`;
-
 const STATUSES = [
   { key: 'want_to_play', label: 'Want to Play' },
   { key: 'playing', label: 'Playing' },
@@ -272,7 +266,7 @@ function BacklogPage({ user }) {
 
   const currentGames = games[activeTab] || [];
 
-  if (loading) return <Container><LoadingState>Loading backlog...</LoadingState></Container>;
+  if (loading) return <Container><LoadingSpinner text="Loading backlog" /></Container>;
 
   return (
     <Container>
