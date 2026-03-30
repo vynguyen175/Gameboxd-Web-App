@@ -81,13 +81,53 @@ function App() {
         <AppContainer>
           <div style={{
             display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
-            fontSize: '2rem',
-            color: 'var(--neon-purple)',
+            gap: '28px',
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.08), transparent 60%)',
           }}>
-            <span className="animate-pulse">Loading Gameboxd...</span>
+            {/* Animated rings */}
+            <div style={{ position: 'relative', width: '80px', height: '80px' }}>
+              <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                border: '3px solid transparent',
+                borderTopColor: '#A855F7',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }} />
+              <div style={{
+                position: 'absolute', top: '8px', left: '8px', width: 'calc(100% - 16px)', height: 'calc(100% - 16px)',
+                border: '3px solid transparent',
+                borderTopColor: '#00F0FF',
+                borderRadius: '50%',
+                animation: 'spin 1.5s linear infinite reverse',
+              }} />
+              <div style={{
+                position: 'absolute', top: '16px', left: '16px', width: 'calc(100% - 32px)', height: 'calc(100% - 32px)',
+                border: '3px solid transparent',
+                borderTopColor: '#FF10F0',
+                borderRadius: '50%',
+                animation: 'spin 2s linear infinite',
+              }} />
+            </div>
+            <div style={{
+              fontSize: '1.4rem',
+              fontWeight: 900,
+              letterSpacing: '0.15em',
+              background: 'linear-gradient(135deg, #A855F7, #00F0FF)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              animation: 'pulse 2s ease-in-out infinite',
+            }}>
+              GAMEBOXD
+            </div>
+            <style>{`
+              @keyframes spin {
+                to { transform: rotate(360deg); }
+              }
+            `}</style>
           </div>
         </AppContainer>
       </ThemeProvider>
