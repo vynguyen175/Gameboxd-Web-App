@@ -288,8 +288,8 @@ function SearchPage({ user }) {
         <ResultsList>
           {filteredResults.map((result, idx) => (
             <ResultCard key={result._id || result.id || idx} onClick={() => handleResultClick(result)}>
-              <ResultImage $image={result.cover || result.gameImageUrl || result.profilePicture}>
-                {!(result.cover || result.gameImageUrl || result.profilePicture) && (
+              <ResultImage $image={result.imageUrl || result.cover || result.gameImageUrl || result.profilePicture}>
+                {!(result.imageUrl || result.cover || result.gameImageUrl || result.profilePicture) && (
                   activeTab === 'games' ? <Gamepad2 /> : activeTab === 'users' ? <User /> : <FileText />
                 )}
               </ResultImage>
