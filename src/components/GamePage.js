@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { ArrowLeft, Star, Gamepad2, Plus, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Star, Gamepad2, Plus, ChevronDown, ExternalLink, Calendar } from 'lucide-react';
 import {
   getGame, getGameReviews, getMyGameStatus, setGameStatus,
   removeGameStatus, getUserLists, addGameToList
@@ -433,7 +433,7 @@ function GamePage({ user }) {
           igdbGameId: Number(igdbId),
           status,
           gameTitle: game?.name || game?.title,
-          coverUrl: game?.cover,
+          coverUrl: game?.imageUrl || game?.cover,
         });
         setCurrentStatus(status);
       }
@@ -448,7 +448,7 @@ function GamePage({ user }) {
       await addGameToList(listId, {
         igdbGameId: Number(igdbId),
         gameTitle: game?.name || game?.title,
-        coverUrl: game?.cover,
+        coverUrl: game?.imageUrl || game?.cover,
       });
     } catch (err) {
       console.error('Add to list error:', err);
@@ -479,16 +479,55 @@ function GamePage({ user }) {
       <BackButton onClick={() => navigate(-1)}><ArrowLeft /> Go Back</BackButton>
 
       <GameHeader>
-        <CoverImage $image={game.cover || game.coverUrl}>
-          {!(game.cover || game.coverUrl) && <Gamepad2 />}
+        <CoverImage $image={game.imageUrl || game.cover || game.coverUrl}>
+          {!(game.imageUrl || game.cover || game.coverUrl) && <Gamepad2 />}
         </CoverImage>
         <GameInfo>
           <GameTitle>{game.name || game.title}</GameTitle>
           <GameMeta>
             {(game.genres || []).map(g => <Tag key={g}>{g}</Tag>)}
             {(game.platforms || []).slice(0, 5).map(p => <Tag key={p}>{p}</Tag>)}
+            {game.releaseDate && <Tag><Calendar style={{ width: 12, height: 12, marginRight: 4, verticalAlign: -1 }} />{game.releaseDate}</Tag>}
           </GameMeta>
-          {game.summary && <Summary>{game.summary}</Summary>}
+          {game.summary && <Summary>{game.summary || game.description}</Summary>}
+
+          {/* Website Links */}
+          {game.websites && game.websites.length > 0 && (
+            <GameMeta>
+              {game.websites.map((w, i) => (
+                <a
+                  key={i}
+                  href={w.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    background: w.label === 'Steam' ? 'rgba(0, 120, 215, 0.15)' :
+                               w.label === 'Epic Games' ? 'rgba(0, 0, 0, 0.3)' :
+                               w.label === 'Official' ? 'rgba(168, 85, 247, 0.15)' :
+                               'var(--tag-bg)',
+                    border: `1px solid ${w.label === 'Steam' ? 'rgba(0, 120, 215, 0.4)' :
+                                         w.label === 'Official' ? 'rgba(168, 85, 247, 0.4)' :
+                                         'var(--tag-border)'}`,
+                    borderRadius: 10,
+                    padding: '6px 14px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    color: w.label === 'Official' ? 'var(--neon-purple)' :
+                           w.label === 'Steam' ? '#66C0F4' :
+                           'var(--text-secondary)',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <ExternalLink style={{ width: 12, height: 12 }} />
+                  {w.label}
+                </a>
+              ))}
+            </GameMeta>
+          )}
 
           <RatingOverview>
             <RatingTop>
