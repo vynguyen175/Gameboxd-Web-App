@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Gamepad2, ThumbsUp, ThumbsDown, MessageCircle, Star, Image } from 'lucide-react';
@@ -221,6 +221,46 @@ const ImageBadge = styled.span`
   svg { width: 12px; height: 12px; }
 `;
 
+const SpoilerOverlay = styled.div`
+  position: relative;
+  cursor: pointer;
+`;
+
+const SpoilerBlur = styled.div`
+  filter: ${props => props.$revealed ? 'none' : 'blur(6px)'};
+  user-select: ${props => props.$revealed ? 'auto' : 'none'};
+  transition: filter 0.3s ease;
+`;
+
+const SpoilerBadge = styled.span`
+  background: rgba(239, 68, 68, 0.2);
+  color: #FCA5A5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
+const RevealButton = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  padding: 8px 16px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 2;
+  pointer-events: none;
+`;
+
 const TopReactions = styled.div`
   display: flex;
   gap: 4px;
@@ -237,6 +277,7 @@ const ReactionPill = styled.span`
 function ReviewCard({ review, onClick }) {
   const navigate = useNavigate();
   const tiltRef = useTilt({ maxTilt: 6, scale: 1.02 });
+  const [spoilerRevealed, setSpoilerRevealed] = useState(false);
 
   const handleUsernameClick = (e) => {
     e.stopPropagation();
@@ -305,9 +346,19 @@ function ReviewCard({ review, onClick }) {
           <RatingValue>{review.rating.toFixed(1)}</RatingValue>
         </Rating>
 
-        <ReviewText>{review.reviewText}</ReviewText>
+        {review.containsSpoilers ? (
+          <SpoilerOverlay onClick={(e) => { e.stopPropagation(); setSpoilerRevealed(!spoilerRevealed); }}>
+            <SpoilerBlur $revealed={spoilerRevealed}>
+              <ReviewText>{review.reviewText}</ReviewText>
+            </SpoilerBlur>
+            {!spoilerRevealed && <RevealButton>Contains Spoilers - Click to reveal</RevealButton>}
+          </SpoilerOverlay>
+        ) : (
+          <ReviewText>{review.reviewText}</ReviewText>
+        )}
         <TagRow>
           {review.genre && <GenreTag>{review.genre}</GenreTag>}
+          {review.containsSpoilers && <SpoilerBadge>SPOILER</SpoilerBadge>}
           {review.images && review.images.length > 0 && (
             <ImageBadge><Image /> {review.images.length}</ImageBadge>
           )}

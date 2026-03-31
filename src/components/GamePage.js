@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { ArrowLeft, Star, Gamepad2, Plus, ChevronDown, ExternalLink, Calendar } from 'lucide-react';
 import {
   getGame, getGameReviews, getMyGameStatus, setGameStatus,
-  removeGameStatus, getUserLists, addGameToList
+  removeGameStatus, getUserLists, addGameToList, getGameRecommendations
 } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
@@ -341,6 +341,72 @@ const EmptyState = styled.div`
   border-radius: 16px;
 `;
 
+const RecommendationSection = styled.div`
+  margin-top: 48px;
+`;
+
+const RecSectionTitle = styled.h2`
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+`;
+
+const ScrollRow = styled.div`
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 0 16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+`;
+
+const RecCard = styled.div`
+  min-width: 160px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: var(--neon-purple);
+    box-shadow: 0 8px 32px var(--glow-purple);
+  }
+`;
+
+const RecCover = styled.div`
+  width: 160px;
+  height: 200px;
+  background: ${props => props.$image
+    ? `url(${props.$image}) center/cover no-repeat`
+    : 'linear-gradient(135deg, var(--neon-purple), var(--neon-cyan))'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg { width: 40px; height: 40px; color: white; opacity: 0.5; }
+`;
+
+const RecName = styled.div`
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
 const STATUSES = ['want_to_play', 'playing', 'completed', 'dropped'];
 const STATUS_LABELS = {
   want_to_play: 'Want to Play',
@@ -364,6 +430,7 @@ function GamePage({ user }) {
   const [selectedReview, setSelectedReview] = useState(null);
   const [lists, setLists] = useState([]);
   const [showListDropdown, setShowListDropdown] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     const loadGame = async () => {
@@ -379,6 +446,10 @@ function GamePage({ user }) {
           const listsData = await getUserLists(user.username).catch(() => []);
           setLists(listsData);
         }
+        // Fetch recommendations
+        getGameRecommendations(igdbId)
+          .then(data => setRecommendations(Array.isArray(data) ? data : []))
+          .catch(() => setRecommendations([]));
       } catch (err) {
         console.error('Error loading game:', err);
       } finally {
@@ -630,6 +701,22 @@ function GamePage({ user }) {
           user={user}
           onClose={() => setSelectedReview(null)}
         />
+      )}
+
+      {recommendations.length > 0 && (
+        <RecommendationSection>
+          <RecSectionTitle>If You Liked This</RecSectionTitle>
+          <ScrollRow>
+            {recommendations.map(rec => (
+              <RecCard key={rec.igdbId || rec.id} onClick={() => navigate(`/game/${rec.igdbId || rec.id}`)}>
+                <RecCover $image={rec.cover || rec.imageUrl || rec.coverUrl}>
+                  {!(rec.cover || rec.imageUrl || rec.coverUrl) && <Gamepad2 />}
+                </RecCover>
+                <RecName>{rec.name || rec.title}</RecName>
+              </RecCard>
+            ))}
+          </ScrollRow>
+        </RecommendationSection>
       )}
     </Container>
   );

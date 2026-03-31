@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Gamepad2, X, ChevronDown } from 'lucide-react';
-import { getUserGameStatuses, setGameStatus, removeGameStatus } from '../services/api';
+import { getUserGameStatuses, setGameStatus, removeGameStatus, getPrioritizedBacklog } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
 
 const Container = styled.div`
@@ -192,6 +192,30 @@ const EmptyState = styled.div`
   border-radius: 16px;
 `;
 
+const PriorityBadge = styled.div`
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  z-index: 2;
+  background: ${props =>
+    props.$score >= 60 ? 'rgba(34, 197, 94, 0.2)' :
+    props.$score >= 30 ? 'rgba(250, 204, 21, 0.2)' :
+    'rgba(148, 163, 184, 0.2)'};
+  color: ${props =>
+    props.$score >= 60 ? '#86EFAC' :
+    props.$score >= 30 ? '#FDE047' :
+    '#94A3B8'};
+  border: 1px solid ${props =>
+    props.$score >= 60 ? 'rgba(34, 197, 94, 0.4)' :
+    props.$score >= 30 ? 'rgba(250, 204, 21, 0.4)' :
+    'rgba(148, 163, 184, 0.3)'};
+  backdrop-filter: blur(8px);
+`;
+
 const STATUSES = [
   { key: 'want_to_play', label: 'Want to Play' },
   { key: 'playing', label: 'Playing' },
@@ -205,6 +229,7 @@ function BacklogPage({ user }) {
   const [games, setGames] = useState({});
   const [loading, setLoading] = useState(true);
   const [openMenu, setOpenMenu] = useState(null);
+  const [priorityMap, setPriorityMap] = useState({});
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -218,6 +243,21 @@ function BacklogPage({ user }) {
           })
         );
         setGames(results);
+
+        // Fetch prioritized backlog data
+        try {
+          const prioritized = await getPrioritizedBacklog(user.username);
+          const pMap = {};
+          if (Array.isArray(prioritized)) {
+            prioritized.forEach(item => {
+              pMap[item.igdbGameId] = item.priorityScore || 0;
+            });
+          }
+          setPriorityMap(pMap);
+        } catch (priErr) {
+          // Prioritized endpoint may not be available, ignore
+          console.error('Priority fetch skipped:', priErr);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -264,7 +304,13 @@ function BacklogPage({ user }) {
     }
   };
 
-  const currentGames = games[activeTab] || [];
+  const currentGames = (() => {
+    const list = games[activeTab] || [];
+    if (activeTab === 'want_to_play' && Object.keys(priorityMap).length > 0) {
+      return [...list].sort((a, b) => (priorityMap[b.igdbGameId] || 0) - (priorityMap[a.igdbGameId] || 0));
+    }
+    return list;
+  })();
 
   if (loading) return <Container><LoadingSpinner text="Loading backlog" /></Container>;
 
@@ -311,6 +357,11 @@ function BacklogPage({ user }) {
                   </StatusMenu>
                 </StatusDropdown>
               </GameInfo>
+              {activeTab === 'want_to_play' && priorityMap[game.igdbGameId] != null && (
+                <PriorityBadge $score={priorityMap[game.igdbGameId]}>
+                  {Math.round(priorityMap[game.igdbGameId])}
+                </PriorityBadge>
+              )}
               <RemoveBtn onClick={() => handleRemove(game)}>
                 <X />
               </RemoveBtn>

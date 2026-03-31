@@ -84,8 +84,8 @@ export const getUserReviews = async (username) => {
   return response.data;
 };
 
-export const createReview = async (gameTitle, reviewText, rating, gameImageUrl = '', genre = '', igdbGameId = null, images = []) => {
-  const response = await api.post('/reviews', { gameTitle, reviewText, rating, gameImageUrl, genre, igdbGameId, images });
+export const createReview = async (gameTitle, reviewText, rating, gameImageUrl = '', genre = '', igdbGameId = null, images = [], containsSpoilers = false) => {
+  const response = await api.post('/reviews', { gameTitle, reviewText, rating, gameImageUrl, genre, igdbGameId, images, containsSpoilers });
   return response.data;
 };
 
@@ -192,6 +192,11 @@ export const getGameReviews = async (igdbId, params = {}) => {
   return response.data;
 };
 
+export const getGameRecommendations = async (igdbId) => {
+  const response = await api.get(`/games/${igdbId}/recommendations`);
+  return response.data;
+};
+
 // ─── Search ─────────────────────────────────────────────────────────────────
 
 export const searchAll = async (query, type) => {
@@ -275,6 +280,11 @@ export const getUserActivity = async (username, cursor) => {
   return response.data;
 };
 
+export const getUserStats = async (username, year) => {
+  const response = await api.get(`/users/${username}/stats`, { params: { year } });
+  return response.data;
+};
+
 // ─── Lists ──────────────────────────────────────────────────────────────────
 
 export const getUserLists = async (username) => {
@@ -334,6 +344,11 @@ export const removeGameStatus = async (igdbGameId) => {
   return response.data;
 };
 
+export const getPrioritizedBacklog = async (username) => {
+  const response = await api.get(`/game-status/user/${username}/prioritized`);
+  return response.data;
+};
+
 // ─── Notifications ──────────────────────────────────────────────────────────
 
 export const getNotifications = async (cursor) => {
@@ -384,61 +399,55 @@ export const markConversationRead = async (conversationId) => {
 };
 
 // ─── Admin ──────────────────────────────────────────────────────────────────
-
-const getAdminHeaders = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem('gameboxd_user'));
-    return { 'x-admin-username': user?.username || '' };
-  } catch { return {}; }
-};
+// Admin auth is handled server-side via JWT token (no extra headers needed)
 
 export const getAdminUsers = async () => {
-  const response = await api.get('/admin/users', { headers: getAdminHeaders() });
+  const response = await api.get('/admin/users');
   return response.data;
 };
 
 export const getAdminReviews = async () => {
-  const response = await api.get('/admin/reviews', { headers: getAdminHeaders() });
+  const response = await api.get('/admin/reviews');
   return response.data;
 };
 
 export const adminDeleteReview = async (reviewId) => {
-  const response = await api.delete(`/admin/reviews/${reviewId}`, { headers: getAdminHeaders() });
+  const response = await api.delete(`/admin/reviews/${reviewId}`);
   return response.data;
 };
 
 export const adminDeleteUser = async (username) => {
-  const response = await api.delete(`/admin/users/${username}`, { headers: getAdminHeaders() });
+  const response = await api.delete(`/admin/users/${username}`);
   return response.data;
 };
 
 export const adminPromoteUser = async (username) => {
-  const response = await api.post(`/admin/users/${username}/promote`, {}, { headers: getAdminHeaders() });
+  const response = await api.post(`/admin/users/${username}/promote`);
   return response.data;
 };
 
 export const adminBanUser = async (username) => {
-  const response = await api.post(`/admin/users/${username}/ban`, {}, { headers: getAdminHeaders() });
+  const response = await api.post(`/admin/users/${username}/ban`);
   return response.data;
 };
 
 export const adminUnbanUser = async (username) => {
-  const response = await api.post(`/admin/users/${username}/unban`, {}, { headers: getAdminHeaders() });
+  const response = await api.post(`/admin/users/${username}/unban`);
   return response.data;
 };
 
 export const adminCreateUser = async (userData) => {
-  const response = await api.post('/admin/users', userData, { headers: getAdminHeaders() });
+  const response = await api.post('/admin/users', userData);
   return response.data;
 };
 
 export const getAdminReports = async () => {
-  const response = await api.get('/admin/reports', { headers: getAdminHeaders() });
+  const response = await api.get('/admin/reports');
   return response.data;
 };
 
 export const resolveReport = async (reportId, status) => {
-  const response = await api.put(`/admin/reports/${reportId}`, { status }, { headers: getAdminHeaders() });
+  const response = await api.put(`/admin/reports/${reportId}`, { status });
   return response.data;
 };
 

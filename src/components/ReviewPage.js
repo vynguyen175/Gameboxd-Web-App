@@ -461,6 +461,36 @@ const GenreBadge = styled.span`
   vertical-align: middle;
 `;
 
+const SpoilerToggle = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: var(--input-bg);
+  border: 2px solid var(--input-border);
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--input-border-focus);
+  }
+`;
+
+const SpoilerCheckbox = styled.input`
+  width: 20px;
+  height: 20px;
+  accent-color: var(--neon-purple);
+  cursor: pointer;
+`;
+
+const SpoilerLabel = styled.span`
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+`;
+
 const MAX_SCREENSHOTS = 5;
 
 function ReviewPage({ user }) {
@@ -477,6 +507,7 @@ function ReviewPage({ user }) {
   const [genreList, setGenreList] = useState([]);
   const [matureGenres, setMatureGenres] = useState([]);
   const [screenshots, setScreenshots] = useState([]); // { file, preview }
+  const [containsSpoilers, setContainsSpoilers] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [, setSearchingGames] = useState(false);
@@ -618,7 +649,8 @@ function ReviewPage({ user }) {
         gameImageUrl,
         selectedGenre,
         selectedIgdbGame?.id || selectedIgdbGame?.igdbId || null,
-        uploadedImages
+        uploadedImages,
+        containsSpoilers
       );
       showToast('Review submitted!');
       setReviewText('');
@@ -626,6 +658,7 @@ function ReviewPage({ user }) {
       setSelectedGame('');
       setSelectedGenre('');
       setSelectedIgdbGame(null);
+      setContainsSpoilers(false);
       setScreenshots([]);
       handleClearImage();
       await loadMyReviews();
@@ -795,6 +828,15 @@ function ReviewPage({ user }) {
               maxLength={500}
             />
           </FormGroup>
+
+          <SpoilerToggle>
+            <SpoilerCheckbox
+              type="checkbox"
+              checked={containsSpoilers}
+              onChange={e => setContainsSpoilers(e.target.checked)}
+            />
+            <SpoilerLabel>Contains Spoilers</SpoilerLabel>
+          </SpoilerToggle>
 
           <SubmitBtn type="submit" disabled={submitting}>
             {submitting ? 'Submitting...' : 'SUBMIT REVIEW'}

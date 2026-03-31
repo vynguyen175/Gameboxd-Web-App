@@ -30,27 +30,29 @@
   --button-primary-start: #A855F7;
   --button-primary-end: #00F0FF;
 
-  /* Component-level variables */
-  --nav-bg: rgba(10, 10, 15, 0.97);
-  --nav-border: rgba(168, 85, 247, 0.2);
-  --card-bg: rgba(20, 20, 25, 0.85);
-  --card-border: rgba(168, 85, 247, 0.2);
-  --card-border-hover: rgba(168, 85, 247, 0.5);
-  --stat-card-bg: rgba(20, 20, 25, 0.6);
-  --input-bg: rgba(10, 10, 15, 0.9);
-  --input-border: rgba(168, 85, 247, 0.3);
+  /* Component-level variables — Glassmorphism */
+  --nav-bg: rgba(10, 10, 20, 0.55);
+  --nav-border: rgba(255, 255, 255, 0.08);
+  --card-bg: rgba(18, 18, 30, 0.65);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-border-hover: rgba(168, 85, 247, 0.4);
+  --stat-card-bg: rgba(20, 20, 35, 0.3);
+  --input-bg: rgba(10, 10, 20, 0.5);
+  --input-border: rgba(255, 255, 255, 0.1);
   --input-border-focus: #A855F7;
-  --vote-btn-bg: rgba(26, 26, 30, 0.6);
-  --section-bg: rgba(15, 15, 20, 0.6);
-  --divider: rgba(168, 85, 247, 0.15);
-  --tag-bg: rgba(168, 85, 247, 0.15);
-  --tag-border: rgba(168, 85, 247, 0.3);
-  --bg-overlay: radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.08), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(0, 240, 255, 0.05), transparent 50%);
+  --vote-btn-bg: rgba(26, 26, 40, 0.4);
+  --section-bg: rgba(15, 15, 25, 0.35);
+  --divider: rgba(255, 255, 255, 0.06);
+  --tag-bg: rgba(168, 85, 247, 0.12);
+  --tag-border: rgba(168, 85, 247, 0.25);
+  --bg-overlay: radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.1), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(0, 240, 255, 0.07), transparent 50%);
 
   /* Glassmorphism */
-  --glass-bg: rgba(20, 20, 30, 0.35);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-blur: 24px;
+  --glass-bg: rgba(20, 20, 35, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-light: rgba(255, 255, 255, 0.15);
+  --glass-blur: 20px;
+  --glass-backdrop: blur(20px) saturate(180%);
 
   /* Layered Shadows */
   --shadow-depth-1: 0 4px 16px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -86,26 +88,28 @@ body.light-mode {
   --button-primary-start: #7C3AED;
   --button-primary-end: #0891B2;
 
-  --nav-bg: rgba(248, 246, 255, 0.97);
-  --nav-border: rgba(124, 58, 237, 0.2);
-  --card-bg: rgba(255, 255, 255, 0.95);
-  --card-border: rgba(124, 58, 237, 0.2);
-  --card-border-hover: rgba(124, 58, 237, 0.5);
-  --stat-card-bg: rgba(255, 255, 255, 0.8);
-  --input-bg: rgba(245, 243, 255, 0.9);
-  --input-border: rgba(124, 58, 237, 0.3);
+  --nav-bg: rgba(248, 246, 255, 0.55);
+  --nav-border: rgba(0, 0, 0, 0.06);
+  --card-bg: rgba(255, 255, 255, 0.55);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-border-hover: rgba(124, 58, 237, 0.35);
+  --stat-card-bg: rgba(255, 255, 255, 0.35);
+  --input-bg: rgba(245, 243, 255, 0.5);
+  --input-border: rgba(0, 0, 0, 0.08);
   --input-border-focus: #7C3AED;
-  --vote-btn-bg: rgba(235, 233, 248, 0.8);
-  --section-bg: rgba(245, 243, 255, 0.7);
-  --divider: rgba(124, 58, 237, 0.15);
-  --tag-bg: rgba(124, 58, 237, 0.1);
-  --tag-border: rgba(124, 58, 237, 0.25);
-  --bg-overlay: radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.06), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(8, 145, 178, 0.04), transparent 50%);
+  --vote-btn-bg: rgba(235, 233, 248, 0.45);
+  --section-bg: rgba(245, 243, 255, 0.4);
+  --divider: rgba(0, 0, 0, 0.06);
+  --tag-bg: rgba(124, 58, 237, 0.08);
+  --tag-border: rgba(124, 58, 237, 0.2);
+  --bg-overlay: radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.08), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(8, 145, 178, 0.06), transparent 50%);
 
   /* Glassmorphism - Light */
-  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg: rgba(255, 255, 255, 0.4);
   --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-border-light: rgba(255, 255, 255, 0.7);
   --glass-blur: 20px;
+  --glass-backdrop: blur(20px) saturate(180%);
 
   /* Layered Shadows - Light */
   --shadow-depth-1: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
