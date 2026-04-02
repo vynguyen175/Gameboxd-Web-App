@@ -10,6 +10,8 @@ import {
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
 import LoadingSpinner from './LoadingSpinner';
+import AchievementsDisplay from './AchievementsDisplay';
+import PremiumBadge from './PremiumBadge';
 
 const PageContainer = styled.div`
   max-width: 900px;
@@ -252,36 +254,6 @@ const CollectionLabel = styled.div`
   font-weight: 700;
   text-transform: uppercase;
   margin-top: 4px;
-`;
-
-// Achievements
-const AchievementsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 24px;
-`;
-
-const AchievementCard = styled.div`
-  background: var(--card-bg);
-  border: 2px solid ${props => props.$unlocked ? 'var(--neon-purple)' : 'var(--card-border)'};
-  border-radius: 14px;
-  padding: 18px;
-  text-align: center;
-  opacity: ${props => props.$unlocked ? 1 : 0.5};
-  transition: all 0.2s ease;
-  ${props => props.$unlocked && `box-shadow: 0 0 10px var(--glow-purple);`}
-`;
-
-const AchievementIcon = styled.div`
-  font-size: 2rem;
-  margin-bottom: 8px;
-`;
-
-const AchievementName = styled.div`
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: var(--text-primary);
 `;
 
 // Activity
@@ -564,6 +536,7 @@ function UserProfilePage({ user }) {
           <ProfileInfo>
             <Username>
               {profile.username}
+              <PremiumBadge tier={profile.premiumTier} isPremium={profile.isPremium} />
               <RoleBadge $isAdmin={profile.role === 'admin'}>
                 {profile.role || 'user'}
               </RoleBadge>
@@ -679,14 +652,7 @@ function UserProfilePage({ user }) {
               <p>No achievements yet.</p>
             </EmptyState>
           ) : (
-            <AchievementsGrid>
-              {achievements.map((ach, i) => (
-                <AchievementCard key={ach._id || i} $unlocked={ach.unlocked !== false}>
-                  <AchievementIcon>{ach.icon || '🏆'}</AchievementIcon>
-                  <AchievementName>{ach.name || ach.title}</AchievementName>
-                </AchievementCard>
-              ))}
-            </AchievementsGrid>
+            <AchievementsDisplay achievements={achievements} />
           )}
         </>
       )}

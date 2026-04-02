@@ -272,6 +272,56 @@ const ConnectButton = styled.button`
   }
 `;
 
+const ToggleRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--card-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const ToggleLabel = styled.div`
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+`;
+
+const ToggleDescription = styled.div`
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 4px;
+`;
+
+const ToggleSwitch = styled.button`
+  width: 48px;
+  height: 26px;
+  border-radius: 13px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  background: ${props => props.$active
+    ? 'linear-gradient(135deg, var(--neon-purple), var(--neon-cyan))'
+    : 'var(--card-border)'};
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: ${props => props.$active ? '24px' : '3px'};
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    transition: left 0.3s ease;
+  }
+`;
+
 const BIO_MAX_LENGTH = 200;
 
 function SettingsPage({ user, onUserUpdate }) {
@@ -284,6 +334,9 @@ function SettingsPage({ user, onUserUpdate }) {
     profilePhoto: user?.profilePicture || '',
     dateOfBirth: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
   });
+  const [emailNotifyOnFollow, setEmailNotifyOnFollow] = useState(user?.emailNotifyOnFollow !== false);
+  const [emailNotifyOnComment, setEmailNotifyOnComment] = useState(user?.emailNotifyOnComment !== false);
+  const [emailNotifyOnReview, setEmailNotifyOnReview] = useState(user?.emailNotifyOnReview !== false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -342,6 +395,9 @@ function SettingsPage({ user, onUserUpdate }) {
         bio: formData.bio,
         profilePhoto: formData.profilePhoto,
         dateOfBirth: formData.dateOfBirth || undefined,
+        emailNotifyOnFollow,
+        emailNotifyOnComment,
+        emailNotifyOnReview,
       });
 
       // Update the user in parent component and localStorage
@@ -465,6 +521,43 @@ function SettingsPage({ user, onUserUpdate }) {
               {formData.bio.length}/{BIO_MAX_LENGTH}
             </CharCount>
           </FormGroup>
+        </SettingsCard>
+
+        <SettingsCard>
+          <SectionTitle>Email Notifications</SectionTitle>
+          <ToggleRow>
+            <div>
+              <ToggleLabel>New Follower</ToggleLabel>
+              <ToggleDescription>Get notified when someone follows you</ToggleDescription>
+            </div>
+            <ToggleSwitch
+              type="button"
+              $active={emailNotifyOnFollow}
+              onClick={() => setEmailNotifyOnFollow(v => !v)}
+            />
+          </ToggleRow>
+          <ToggleRow>
+            <div>
+              <ToggleLabel>New Comment</ToggleLabel>
+              <ToggleDescription>Get notified when someone comments on your review</ToggleDescription>
+            </div>
+            <ToggleSwitch
+              type="button"
+              $active={emailNotifyOnComment}
+              onClick={() => setEmailNotifyOnComment(v => !v)}
+            />
+          </ToggleRow>
+          <ToggleRow>
+            <div>
+              <ToggleLabel>Review Activity</ToggleLabel>
+              <ToggleDescription>Get notified about activity on your reviews</ToggleDescription>
+            </div>
+            <ToggleSwitch
+              type="button"
+              $active={emailNotifyOnReview}
+              onClick={() => setEmailNotifyOnReview(v => !v)}
+            />
+          </ToggleRow>
         </SettingsCard>
 
         <SettingsCard>

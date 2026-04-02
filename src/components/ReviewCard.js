@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { Gamepad2, ThumbsUp, ThumbsDown, MessageCircle, Star, Image } from 'lucide-react';
 import useTilt from '../hooks/useTilt';
+import PremiumBadge from './PremiumBadge';
 
 const Card = styled.div`
   background: var(--glass-bg);
@@ -336,7 +337,10 @@ function ReviewCard({ review, onClick }) {
         <UserInfo>
           <Avatar>{review.username.charAt(0).toUpperCase()}</Avatar>
           <UserDetails>
-            <Username onClick={handleUsernameClick}>{review.username}</Username>
+            <Username onClick={handleUsernameClick}>
+              {review.username}
+              <PremiumBadge tier={review.premiumTier} isPremium={review.isPremium} />
+            </Username>
             <Timestamp>{getTimeAgo(review.timestamp)}</Timestamp>
           </UserDetails>
         </UserInfo>

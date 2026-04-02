@@ -13,6 +13,7 @@ import {
   resolveReport,
 } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
+import AnalyticsDashboard from './AnalyticsDashboard';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -708,6 +709,9 @@ function AdminPage({ user }) {
         <Tab $active={activeTab === 'reports'} onClick={() => { setActiveTab('reports'); setSearchTerm(''); }}>
           Reports ({reports.filter(r => r.status === 'pending' || !r.status).length})
         </Tab>
+        <Tab $active={activeTab === 'analytics'} onClick={() => { setActiveTab('analytics'); setSearchTerm(''); }}>
+          Analytics
+        </Tab>
       </TabsContainer>
 
       {(activeTab === 'users' || activeTab === 'reviews') && <Card>
@@ -876,6 +880,10 @@ function AdminPage({ user }) {
             </div>
           )}
         </Card>
+      )}
+
+      {activeTab === 'analytics' && (
+        <AnalyticsDashboard />
       )}
 
       {showCreateModal && (

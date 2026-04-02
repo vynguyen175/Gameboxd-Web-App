@@ -462,8 +462,76 @@ export const getSteamLibrary = async (steamId) => {
   return response.data;
 };
 
+export const linkSteamAccount = async (steamId) => {
+  const response = await api.put('/steam/link', { steamId });
+  return response.data;
+};
+
+export const unlinkSteamAccount = async () => {
+  const response = await api.delete('/steam/link');
+  return response.data;
+};
+
+export const getSteamProfile = async (steamId) => {
+  const response = await api.get(`/steam/profile/${steamId}`);
+  return response.data;
+};
+
 export const importSteamGames = async (games) => {
   const response = await api.post('/steam/import', { games });
+  return response.data;
+};
+
+// ─── Admin Analytics ────────────────────────────────────────────────────────
+
+export const getAnalyticsGrowth = async () => {
+  const response = await api.get('/admin/analytics/growth', { headers: getAdminHeaders() });
+  return response.data;
+};
+
+export const getAnalyticsEngagement = async () => {
+  const response = await api.get('/admin/analytics/engagement', { headers: getAdminHeaders() });
+  return response.data;
+};
+
+export const getAnalyticsTopGames = async () => {
+  const response = await api.get('/admin/analytics/top-games', { headers: getAdminHeaders() });
+  return response.data;
+};
+
+// ─── News ──────────────────────────────────────────────────────────────────
+
+export const getNews = async () => {
+  const response = await api.get('/news');
+  return response.data;
+};
+
+// ─── Wishlist & Price Alerts ────────────────────────────────────────────────
+
+export const getWishlist = async (username) => {
+  const response = await api.get(`/wishlist/${username}`);
+  return response.data;
+};
+
+export const createPriceAlert = async (data) => {
+  const response = await api.post('/price-alerts', data);
+  return response.data;
+};
+
+export const getPriceAlerts = async (username) => {
+  const response = await api.get(`/price-alerts/${username}`);
+  return response.data;
+};
+
+export const deletePriceAlert = async (id) => {
+  const response = await api.delete(`/price-alerts/${id}`);
+  return response.data;
+};
+
+// ─── Premium ───────────────────────────────────────────────────────────────
+
+export const getPremiumStatus = async () => {
+  const response = await api.get('/premium/status');
   return response.data;
 };
 

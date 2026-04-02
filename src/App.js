@@ -24,6 +24,9 @@ import DateOfBirthPrompt from './components/DateOfBirthPrompt';
 import YearInReviewPage from './components/YearInReviewPage';
 import EmbedReviewPage from './components/EmbedReviewPage';
 import SteamImportPage from './components/SteamImportPage';
+import NewsPage from './components/NewsPage';
+import WishlistPage from './components/WishlistPage';
+import PremiumPage from './components/PremiumPage';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -220,6 +223,18 @@ function App() {
             <Route
               path="/steam-import"
               element={user ? <SteamImportPage user={user} /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/news"
+              element={user ? <NewsPage /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/wishlist"
+              element={user ? <WishlistPage user={user} /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/premium"
+              element={user ? <PremiumPage user={user} /> : <Navigate to="/login" />}
             />
 
             {/* Legacy routes */}
