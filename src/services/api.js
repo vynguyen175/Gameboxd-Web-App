@@ -18,20 +18,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor: handle 401
+// Response interceptor: handle errors
+// Do NOT hard redirect on 401 — let App.js handle auth state
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Only force logout on 401 from non-auth endpoints
-    // Let App.js handle auth state for /auth/me
-    if (error.response && error.response.status === 401) {
-      const url = error.config?.url || '';
-      if (!url.includes('/auth/me') && !url.includes('/auth/login') && !url.includes('/auth/google')) {
-        localStorage.removeItem('gameboxd_token');
-        localStorage.removeItem('gameboxd_user');
-        window.location.href = '/login';
-      }
-    }
     return Promise.reject(error);
   }
 );
@@ -453,7 +444,7 @@ export const getAdminReports = async () => {
 };
 
 export const resolveReport = async (reportId, status) => {
-  const response = await api.put(`/admin/reports/${reportId}`, { status });
+  const response = await api.put(`/admin/reports/${reportId}`, { status }, { headers: getAdminHeaders() });
   return response.data;
 };
 
