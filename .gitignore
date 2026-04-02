@@ -28,3 +28,5 @@ yarn-error.log*
 *.swo
 
 .claude/
+
+BUSINESS_FEATURES.md
