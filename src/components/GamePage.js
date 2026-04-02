@@ -407,6 +407,47 @@ const RecName = styled.div`
   overflow: hidden;
 `;
 
+const StoreSection = styled.div`
+  margin-top: 24px;
+`;
+
+const StoreSectionTitle = styled.h3`
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+`;
+
+const StoreButtons = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+`;
+
+const StoreButton = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 20px var(--glow-purple);
+    transform: translateY(-2px);
+  }
+`;
+
 const STATUSES = ['want_to_play', 'playing', 'completed', 'dropped'];
 const STATUS_LABELS = {
   want_to_play: 'Want to Play',
@@ -438,7 +479,7 @@ function GamePage({ user }) {
       try {
         const [gameData, statusData] = await Promise.all([
           getGame(igdbId),
-          getMyGameStatus(igdbId).catch(() => null),
+          user ? getMyGameStatus(igdbId).catch(() => null) : Promise.resolve(null),
         ]);
         setGame(gameData);
         setCurrentStatus(statusData?.status || null);
@@ -600,6 +641,32 @@ function GamePage({ user }) {
             </GameMeta>
           )}
 
+          {/* Where to Buy */}
+          {game.storeLinks && game.storeLinks.length > 0 && (
+            <StoreSection>
+              <StoreSectionTitle>Where to Buy</StoreSectionTitle>
+              <StoreButtons>
+                {game.storeLinks.map((store, i) => (
+                  <StoreButton key={i} href={store.url} target="_blank" rel="noopener noreferrer">
+                    {store.name}
+                  </StoreButton>
+                ))}
+              </StoreButtons>
+            </StoreSection>
+          )}
+          {!game.storeLinks?.length && game.websites && game.websites.length > 0 && (
+            <StoreSection>
+              <StoreSectionTitle>Where to Buy</StoreSectionTitle>
+              <StoreButtons>
+                {game.websites.filter(w => ['Steam', 'Epic Games', 'GOG', 'PlayStation Store', 'Xbox Store', 'Nintendo eShop'].includes(w.label)).map((w, i) => (
+                  <StoreButton key={i} href={w.url} target="_blank" rel="noopener noreferrer">
+                    {w.label}
+                  </StoreButton>
+                ))}
+              </StoreButtons>
+            </StoreSection>
+          )}
+
           <RatingOverview>
             <RatingTop>
               <BigRating>{avgRating > 0 ? avgRating.toFixed(1) : '--'}</BigRating>
@@ -633,31 +700,33 @@ function GamePage({ user }) {
             </RatingBars>
           </RatingOverview>
 
-          <ActionsRow>
-            {STATUSES.map(s => (
-              <StatusBtn key={s} $active={currentStatus === s} onClick={() => handleStatusChange(s)}>
-                {STATUS_LABELS[s]}
-              </StatusBtn>
-            ))}
-            <ListDropdown>
-              <ListBtn onClick={() => setShowListDropdown(!showListDropdown)}>
-                <Plus /> Add to List <ChevronDown />
-              </ListBtn>
-              <DropdownMenu $show={showListDropdown}>
-                {lists.length === 0 ? (
-                  <DropdownItem onClick={() => { setShowListDropdown(false); navigate('/my-lists'); }}>
-                    Create a list first
-                  </DropdownItem>
-                ) : (
-                  lists.map(list => (
-                    <DropdownItem key={list._id} onClick={() => handleAddToList(list._id)}>
-                      {list.title}
+          {user && (
+            <ActionsRow>
+              {STATUSES.map(s => (
+                <StatusBtn key={s} $active={currentStatus === s} onClick={() => handleStatusChange(s)}>
+                  {STATUS_LABELS[s]}
+                </StatusBtn>
+              ))}
+              <ListDropdown>
+                <ListBtn onClick={() => setShowListDropdown(!showListDropdown)}>
+                  <Plus /> Add to List <ChevronDown />
+                </ListBtn>
+                <DropdownMenu $show={showListDropdown}>
+                  {lists.length === 0 ? (
+                    <DropdownItem onClick={() => { setShowListDropdown(false); navigate('/my-lists'); }}>
+                      Create a list first
                     </DropdownItem>
-                  ))
-                )}
-              </DropdownMenu>
-            </ListDropdown>
-          </ActionsRow>
+                  ) : (
+                    lists.map(list => (
+                      <DropdownItem key={list._id} onClick={() => handleAddToList(list._id)}>
+                        {list.title}
+                      </DropdownItem>
+                    ))
+                  )}
+                </DropdownMenu>
+              </ListDropdown>
+            </ActionsRow>
+          )}
         </GameInfo>
       </GameHeader>
 
@@ -669,9 +738,11 @@ function GamePage({ user }) {
             <option value="highest">Highest Rated</option>
             <option value="upvoted">Most Upvoted</option>
           </SortSelect>
-          <WriteReviewBtn onClick={() => navigate('/write-review')}>
-            Write a Review
-          </WriteReviewBtn>
+          {user && (
+            <WriteReviewBtn onClick={() => navigate('/write-review')}>
+              Write a Review
+            </WriteReviewBtn>
+          )}
         </div>
       </SortRow>
 

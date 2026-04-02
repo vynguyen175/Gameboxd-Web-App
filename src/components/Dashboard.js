@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { getAllReviews } from '../services/api';
+import { getAllReviews, getFeaturedGames } from '../services/api';
 import ReviewCard from './ReviewCard';
 import ReviewModal from './ReviewModal';
 import ReviewFilters from './ReviewFilters';
@@ -139,9 +140,68 @@ const LoadMoreButton = styled.button`
   }
 `;
 
+const FeaturedSection = styled.div`
+  margin-bottom: 40px;
+`;
+
+const FeaturedCard = styled.div`
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(0, 240, 255, 0.1));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 40px var(--glow-purple);
+    transform: translateY(-2px);
+  }
+`;
+
+const FeaturedBadge = styled.span`
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: white;
+`;
+
+const FeaturedImage = styled.img`
+  width: 80px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+`;
+
+const FeaturedInfo = styled.div`
+  flex: 1;
+`;
+
+const FeaturedTitle = styled.h3`
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+`;
+
+const FeaturedTagline = styled.p`
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+`;
+
 function Dashboard({ user }) {
+  const navigate = useNavigate();
   const { filterMatureContent } = useAgeRestriction(user);
   const [reviews, setReviews] = useState([]);
+  const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
@@ -189,6 +249,10 @@ function Dashboard({ user }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
+  useEffect(() => {
+    getFeaturedGames().then(data => setFeatured(Array.isArray(data) ? data : [])).catch(() => {});
+  }, []);
+
   const handleFilterChange = useCallback((newFilters) => {
     setFilters(newFilters);
   }, []);
@@ -214,6 +278,21 @@ function Dashboard({ user }) {
         <Title>TRENDING GAMES</Title>
         <Subtitle>Latest reviews from the gaming community</Subtitle>
       </Header>
+
+      {featured.length > 0 && (
+        <FeaturedSection>
+          {featured.slice(0, 1).map(game => (
+            <FeaturedCard key={game._id} onClick={() => navigate(`/game/${game.igdbGameId}`)}>
+              {game.coverUrl && <FeaturedImage src={game.coverUrl} alt={game.title} />}
+              <FeaturedInfo>
+                <FeaturedBadge>Featured</FeaturedBadge>
+                <FeaturedTitle>{game.title}</FeaturedTitle>
+                {game.tagline && <FeaturedTagline>{game.tagline}</FeaturedTagline>}
+              </FeaturedInfo>
+            </FeaturedCard>
+          ))}
+        </FeaturedSection>
+      )}
 
       <Stats>
         <StatCard>

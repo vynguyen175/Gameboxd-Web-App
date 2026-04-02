@@ -5,7 +5,7 @@ import {
   voteOnReview, removeVote, getVoteStatus, getComments, addComment,
   deleteComment, getReactions, toggleReaction, reportReview
 } from '../services/api';
-import { X, Gamepad2, ThumbsUp, ThumbsDown, Star, Trash2, Send, Flag, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Gamepad2, ThumbsUp, ThumbsDown, Star, Trash2, Send, Flag, Share2, ChevronLeft, ChevronRight, Code } from 'lucide-react';
 
 const Overlay = styled.div`
   position: fixed;
@@ -599,6 +599,7 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
   const [reportReason, setReportReason] = useState('');
   const [reporting, setReporting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [embedCopied, setEmbedCopied] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
 
   const isOwnReview = review.username === user?.username;
@@ -732,6 +733,13 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
     }
   };
 
+  const handleEmbed = () => {
+    const embedCode = `<iframe src="${window.location.origin}/embed/review/${review._id}" width="500" height="250" frameborder="0" style="border-radius:16px;"></iframe>`;
+    navigator.clipboard.writeText(embedCode);
+    setEmbedCopied(true);
+    setTimeout(() => setEmbedCopied(false), 2000);
+  };
+
   const formatTime = (timestamp) => {
     const diff = Date.now() - new Date(timestamp).getTime();
     const minutes = Math.floor(diff / 60000);
@@ -857,6 +865,7 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
 
             <ActionBtns>
               <SmallBtn onClick={handleShare}><Share2 /> Share</SmallBtn>
+              <SmallBtn onClick={handleEmbed}><Code /> {embedCopied ? 'Copied!' : 'Embed'}</SmallBtn>
               {!isOwnReview && (
                 <SmallBtn onClick={() => setShowReport(true)}><Flag /> Report</SmallBtn>
               )}
@@ -933,6 +942,7 @@ function ReviewModal({ review, user, onClose, onVoteUpdate }) {
       )}
 
       {copied && <CopiedToast>Link copied to clipboard!</CopiedToast>}
+      {embedCopied && <CopiedToast>Embed code copied to clipboard!</CopiedToast>}
     </Overlay>
   );
 }

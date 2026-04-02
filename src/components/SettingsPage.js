@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { uploadImage, updateUserProfile } from '../services/api';
 
@@ -249,9 +250,32 @@ const Message = styled.div`
   `}
 `;
 
+const ConnectButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 120, 215, 0.15);
+  border: 2px solid rgba(0, 120, 215, 0.4);
+  border-radius: 10px;
+  padding: 14px 20px;
+  color: #66C0F4;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+
+  &:hover {
+    background: rgba(0, 120, 215, 0.25);
+    border-color: #66C0F4;
+    transform: translateY(-2px);
+  }
+`;
+
 const BIO_MAX_LENGTH = 200;
 
 function SettingsPage({ user, onUserUpdate }) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: user?.username || '',
     email: user?.email || '',
@@ -441,6 +465,13 @@ function SettingsPage({ user, onUserUpdate }) {
               {formData.bio.length}/{BIO_MAX_LENGTH}
             </CharCount>
           </FormGroup>
+        </SettingsCard>
+
+        <SettingsCard>
+          <SectionTitle>Connected Services</SectionTitle>
+          <ConnectButton type="button" onClick={() => navigate('/steam-import')}>
+            Import Steam Library
+          </ConnectButton>
         </SettingsCard>
 
         <SaveButton type="submit" disabled={saving}>

@@ -22,6 +22,8 @@ import ResetPasswordPage from './components/ResetPasswordPage';
 import SharedReviewPage from './components/SharedReviewPage';
 import DateOfBirthPrompt from './components/DateOfBirthPrompt';
 import YearInReviewPage from './components/YearInReviewPage';
+import EmbedReviewPage from './components/EmbedReviewPage';
+import SteamImportPage from './components/SteamImportPage';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -163,6 +165,12 @@ function App() {
             />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/review/:id" element={<SharedReviewPage />} />
+            <Route path="/embed/review/:id" element={<EmbedReviewPage />} />
+
+            {/* Public routes (accessible without login) */}
+            <Route path="/game/:igdbId" element={<GamePage user={user} />} />
+            <Route path="/profile/:username" element={<UserProfilePage user={user} />} />
+            <Route path="/stats/:username" element={<YearInReviewPage user={user} />} />
 
             {/* Protected routes */}
             <Route
@@ -186,16 +194,8 @@ function App() {
               element={user ? <AdminPage user={user} /> : <Navigate to="/login" />}
             />
             <Route
-              path="/profile/:username"
-              element={user ? <UserProfilePage user={user} /> : <Navigate to="/login" />}
-            />
-            <Route
               path="/search"
               element={user ? <SearchPage user={user} /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/game/:igdbId"
-              element={user ? <GamePage user={user} /> : <Navigate to="/login" />}
             />
             <Route
               path="/lists/:id"
@@ -218,8 +218,8 @@ function App() {
               element={user ? <MessagesPage user={user} /> : <Navigate to="/login" />}
             />
             <Route
-              path="/stats/:username"
-              element={user ? <YearInReviewPage user={user} /> : <Navigate to="/login" />}
+              path="/steam-import"
+              element={user ? <SteamImportPage user={user} /> : <Navigate to="/login" />}
             />
 
             {/* Legacy routes */}

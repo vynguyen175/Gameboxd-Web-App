@@ -451,4 +451,23 @@ export const resolveReport = async (reportId, status) => {
   return response.data;
 };
 
+// ─── Featured Games ────────────────────────────────────────────────────────
+
+export const getFeaturedGames = async () => {
+  const response = await api.get('/games/featured');
+  return response.data;
+};
+
+// ─── Steam Import ──────────────────────────────────────────────────────────
+
+export const getSteamLibrary = async (steamId) => {
+  const response = await api.get(`/steam/library/${steamId}`);
+  return response.data;
+};
+
+export const importSteamGames = async (games) => {
+  const response = await api.post('/steam/import', { games });
+  return response.data;
+};
+
 export default api;
