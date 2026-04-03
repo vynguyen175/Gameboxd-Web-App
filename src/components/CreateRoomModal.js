@@ -222,9 +222,9 @@ function CreateRoomModal({ onClose, onCreated }) {
     try {
       const room = await createChatRoom({
         name: name.trim(),
-        description: description.trim(),
+        description: description.trim() || undefined,
         icon: icon.trim() || undefined,
-        isPublic,
+        type: isPublic ? 'public' : 'private',
       });
       onCreated(room);
       onClose();

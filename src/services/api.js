@@ -579,4 +579,9 @@ export const getChatUnreadCounts = async () => {
   return response.data;
 };
 
+export const joinChatRoomByCode = async (code) => {
+  const response = await api.post('/chatrooms/join-code', { code });
+  return response.data;
+};
+
 export default api;

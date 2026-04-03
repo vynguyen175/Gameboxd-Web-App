@@ -837,9 +837,26 @@ function ChatRoomsPage({ user }) {
       <Sidebar $visible={mobileView === 'sidebar'}>
         <SidebarHeader>
           <SidebarTitle>Chat Rooms</SidebarTitle>
-          <CreateBtn onClick={() => setShowCreate(true)} title="Create Room">
-            <Plus size={16} />
-          </CreateBtn>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <CreateBtn onClick={() => {
+              const code = prompt('Enter invite code to join a private room:');
+              if (code && code.trim()) {
+                import('../services/api').then(({ joinChatRoomByCode }) => {
+                  joinChatRoomByCode(code.trim()).then(room => {
+                    window.location.reload();
+                    alert(`Joined "${room.name}"!`);
+                  }).catch(err => {
+                    alert(err.response?.data?.error || 'Invalid invite code');
+                  });
+                });
+              }
+            }} title="Join by Code" style={{ fontSize: '0.7rem', fontWeight: 700 }}>
+              🔑
+            </CreateBtn>
+            <CreateBtn onClick={() => setShowCreate(true)} title="Create Room">
+              <Plus size={16} />
+            </CreateBtn>
+          </div>
         </SidebarHeader>
 
         <RoomList>
@@ -886,6 +903,29 @@ function ChatRoomsPage({ user }) {
               <Hash size={20} style={{ color: 'var(--neon-purple)' }} />
               <ChatTitle>
                 {activeRoom.name}
+                {activeRoom.type === 'private' && (
+                  <span style={{
+                    fontSize: '0.7rem',
+                    background: 'rgba(168, 85, 247, 0.2)',
+                    border: '1px solid rgba(168, 85, 247, 0.4)',
+                    borderRadius: 6,
+                    padding: '2px 8px',
+                    color: 'var(--neon-purple)',
+                    fontWeight: 700,
+                    marginLeft: 8,
+                    cursor: 'pointer',
+                  }}
+                    onClick={() => {
+                      if (activeRoom.inviteCode) {
+                        navigator.clipboard.writeText(activeRoom.inviteCode);
+                        alert('Invite code copied: ' + activeRoom.inviteCode);
+                      }
+                    }}
+                    title={activeRoom.inviteCode ? `Code: ${activeRoom.inviteCode} (click to copy)` : 'Private room'}
+                  >
+                    {activeRoom.inviteCode ? `Code: ${activeRoom.inviteCode}` : 'Private'}
+                  </span>
+                )}
                 {activeRoom.description && (
                   <ChatDescription>- {activeRoom.description}</ChatDescription>
                 )}
