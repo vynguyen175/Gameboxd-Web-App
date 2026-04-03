@@ -27,6 +27,8 @@ import SteamImportPage from './components/SteamImportPage';
 import NewsPage from './components/NewsPage';
 import WishlistPage from './components/WishlistPage';
 import PremiumPage from './components/PremiumPage';
+import ChatRoomsPage from './components/ChatRoomsPage';
+import { connectSocket, disconnectSocket } from './services/socket';
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -54,6 +56,7 @@ function App() {
           const userData = await getMe();
           setUser(userData);
           localStorage.setItem('gameboxd_user', JSON.stringify(userData));
+          connectSocket();
         } catch (err) {
           // Only clear if it's a real 401, not a network error
           if (err.response && err.response.status === 401) {
@@ -61,7 +64,10 @@ function App() {
             localStorage.removeItem('gameboxd_user');
             setUser(null);
           }
-          // On network errors, keep using cached user
+          // On network errors, keep using cached user and still connect socket
+          if (!err.response || err.response.status !== 401) {
+            connectSocket();
+          }
         }
       } else {
         localStorage.removeItem('gameboxd_user');
@@ -80,9 +86,11 @@ function App() {
     if (userData.token) {
       localStorage.setItem('gameboxd_token', userData.token);
     }
+    connectSocket();
   };
 
   const handleLogout = () => {
+    disconnectSocket();
     setUser(null);
     localStorage.removeItem('gameboxd_user');
     localStorage.removeItem('gameboxd_token');
@@ -235,6 +243,14 @@ function App() {
             <Route
               path="/premium"
               element={user ? <PremiumPage user={user} /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/chat"
+              element={user ? <ChatRoomsPage user={user} /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/chat/:roomId"
+              element={user ? <ChatRoomsPage user={user} /> : <Navigate to="/login" />}
             />
 
             {/* Legacy routes */}

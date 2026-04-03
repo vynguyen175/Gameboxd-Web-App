@@ -535,4 +535,48 @@ export const getPremiumStatus = async () => {
   return response.data;
 };
 
+// ─── Chat Rooms ──────────────────────────────────────────────────────────
+export const getChatRooms = async () => {
+  const response = await api.get('/chatrooms');
+  return response.data;
+};
+export const createChatRoom = async (data) => {
+  const response = await api.post('/chatrooms', data);
+  return response.data;
+};
+export const getChatRoom = async (id) => {
+  const response = await api.get(`/chatrooms/${id}`);
+  return response.data;
+};
+export const joinChatRoom = async (id) => {
+  const response = await api.post(`/chatrooms/${id}/join`);
+  return response.data;
+};
+export const leaveChatRoom = async (id) => {
+  const response = await api.post(`/chatrooms/${id}/leave`);
+  return response.data;
+};
+export const getChatMessages = async (id, cursor) => {
+  const params = { limit: 50 };
+  if (cursor) params.cursor = cursor;
+  const response = await api.get(`/chatrooms/${id}/messages`, { params });
+  return response.data;
+};
+export const getChatRoomMembers = async (id) => {
+  const response = await api.get(`/chatrooms/${id}/members`);
+  return response.data;
+};
+export const inviteToChatRoom = async (id, username) => {
+  const response = await api.post(`/chatrooms/${id}/invite`, { username });
+  return response.data;
+};
+export const markChatRoomRead = async (id) => {
+  const response = await api.post(`/chatrooms/${id}/read`);
+  return response.data;
+};
+export const getChatUnreadCounts = async () => {
+  const response = await api.get('/chatrooms/unread/counts');
+  return response.data;
+};
+
 export default api;

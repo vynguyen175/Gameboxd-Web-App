@@ -444,6 +444,7 @@ function Navigation({ user, onLogout }) {
         <Tab to="/backlog">Backlog</Tab>
         <Tab to="/wishlist">Wishlist</Tab>
         <Tab to="/news">News</Tab>
+        <Tab to="/chat">Chat</Tab>
       </TabBar>
     </Nav>
   );
