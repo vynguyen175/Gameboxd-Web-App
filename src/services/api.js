@@ -499,13 +499,6 @@ export const getAnalyticsTopGames = async () => {
   return response.data;
 };
 
-// ─── News ──────────────────────────────────────────────────────────────────
-
-export const getNews = async () => {
-  const response = await api.get('/news');
-  return response.data;
-};
-
 // ─── Wishlist & Price Alerts ────────────────────────────────────────────────
 
 export const getWishlist = async (username) => {
