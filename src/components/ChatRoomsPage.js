@@ -20,11 +20,11 @@ const dotPulse = keyframes`
 
 const PageWrapper = styled.div`
   display: flex;
-  height: calc(100vh - 110px);
+  height: calc(100vh - 20px);
   overflow: hidden;
 
   @media (max-width: 768px) {
-    height: calc(100vh - 100px);
+    height: calc(100vh - 72px);
   }
 `;
 
@@ -600,15 +600,17 @@ function ChatRoomsPage({ user }) {
     const socket = getSocket();
     if (!socket) return;
 
-    const handleNewMessage = (msg) => {
+    const handleNewMessage = (data) => {
+      const msg = data.message || data;
+      const roomId = data.roomId || msg.roomId;
       const currentRoom = activeRoomRef.current;
-      if (msg.roomId === currentRoom?._id) {
+      if (roomId === currentRoom?._id) {
         setMessages(prev => [...prev, msg]);
       } else {
         // Increment unread for other rooms
         setUnreadCounts(prev => ({
           ...prev,
-          [msg.roomId]: (prev[msg.roomId] || 0) + 1,
+          [roomId]: (prev[roomId] || 0) + 1,
         }));
       }
       // Update room preview
@@ -657,7 +659,7 @@ function ChatRoomsPage({ user }) {
       }
     };
 
-    socket.on('chat:message', handleNewMessage);
+    socket.on('chat:newMessage', handleNewMessage);
     socket.on('chat:typing', handleTyping);
     socket.on('chat:stopTyping', handleStopTyping);
     socket.on('chat:onlineUsers', handleOnlineUsers);
@@ -665,7 +667,7 @@ function ChatRoomsPage({ user }) {
     socket.on('chat:userLeft', handleUserLeft);
 
     return () => {
-      socket.off('chat:message', handleNewMessage);
+      socket.off('chat:newMessage', handleNewMessage);
       socket.off('chat:typing', handleTyping);
       socket.off('chat:stopTyping', handleStopTyping);
       socket.off('chat:onlineUsers', handleOnlineUsers);

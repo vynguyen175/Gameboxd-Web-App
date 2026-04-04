@@ -498,6 +498,7 @@ function Dashboard({ user }) {
 
   const [reviews, setReviews] = useState([]);
   const [trendingGames, setTrendingGames] = useState([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
   const [followerCount, setFollowerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -553,9 +554,10 @@ function Dashboard({ user }) {
     getTrendingGames()
       .then(data => {
         const games = Array.isArray(data) ? data : (data.games || []);
-        setTrendingGames(games.filter(g => g.imageUrl)); // only games with covers
+        setTrendingGames(games.filter(g => g.imageUrl));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setTrendingLoading(false));
   }, []);
 
   // Fetch followers
