@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { getNews } from '../services/api';
+import { fetchGamingNews } from '../services/newsService';
 import LoadingSpinner from './LoadingSpinner';
 
 const fadeIn = keyframes`
@@ -117,8 +117,8 @@ const ArticleMeta = styled.div`
 `;
 
 const SourceBadge = styled.span`
-  background: rgba(168, 85, 247, 0.15);
-  color: var(--neon-purple);
+  background: ${props => props.$bg || 'rgba(168, 85, 247, 0.15)'};
+  color: ${props => props.$color || 'var(--neon-purple)'};
   padding: 3px 10px;
   border-radius: 6px;
   font-weight: 700;
@@ -149,6 +149,46 @@ const ErrorMessage = styled.div`
   margin-bottom: 24px;
 `;
 
+const SOURCE_COLORS = {
+  IGN: { bg: 'rgba(191, 0, 0, 0.15)', text: '#FF4444' },
+  GameSpot: { bg: 'rgba(255, 170, 0, 0.15)', text: '#FFAA00' },
+  'PC Gamer': { bg: 'rgba(59, 130, 246, 0.15)', text: '#60A5FA' },
+  Kotaku: { bg: 'rgba(168, 85, 247, 0.15)', text: '#A855F7' },
+};
+
+const HeaderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+`;
+
+const HeaderLeft = styled.div``;
+
+const RefreshButton = styled.button`
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  &:hover {
+    border-color: var(--neon-purple);
+    color: var(--neon-purple);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 function timeAgo(dateStr) {
   const now = new Date();
   const date = new Date(dateStr);
@@ -169,25 +209,34 @@ function NewsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const loadNews = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchGamingNews();
+      setArticles(data);
+    } catch (err) {
+      setError('Failed to load news. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchNews = async () => {
-      setLoading(true);
-      try {
-        const data = await getNews();
-        setArticles(Array.isArray(data) ? data : []);
-      } catch (err) {
-        setError('Failed to load news. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchNews();
+    loadNews();
   }, []);
 
   return (
     <PageContainer>
-      <PageTitle>Gaming News</PageTitle>
-      <PageSubtitle>Latest news from the gaming world</PageSubtitle>
+      <HeaderRow>
+        <HeaderLeft>
+          <PageTitle>Gaming News</PageTitle>
+          <PageSubtitle style={{ marginBottom: 0 }}>Latest news from the gaming world</PageSubtitle>
+        </HeaderLeft>
+        <RefreshButton onClick={loadNews} disabled={loading}>
+          {loading ? 'Loading...' : 'Refresh'}
+        </RefreshButton>
+      </HeaderRow>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
@@ -200,27 +249,32 @@ function NewsPage() {
         </EmptyState>
       ) : (
         <ArticleGrid>
-          {articles.map((article, i) => (
-            <ArticleCard
-              key={article._id || article.url}
-              href={article.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              $delay={`${i * 0.05}s`}
-            >
-              <ArticleImage $src={article.imageUrl} />
-              <ArticleContent>
-                <div>
-                  <ArticleTitle>{article.title}</ArticleTitle>
-                  <ArticleSummary>{article.summary}</ArticleSummary>
-                </div>
-                <ArticleMeta>
-                  <SourceBadge>{article.source}</SourceBadge>
-                  <span>{timeAgo(article.publishedAt)}</span>
-                </ArticleMeta>
-              </ArticleContent>
-            </ArticleCard>
-          ))}
+          {articles.map((article, i) => {
+            const colors = SOURCE_COLORS[article.source] || {};
+            return (
+              <ArticleCard
+                key={article.url + i}
+                href={article.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                $delay={`${i * 0.05}s`}
+              >
+                <ArticleImage $src={article.imageUrl} />
+                <ArticleContent>
+                  <div>
+                    <ArticleTitle>{article.title}</ArticleTitle>
+                    <ArticleSummary>{article.summary}</ArticleSummary>
+                  </div>
+                  <ArticleMeta>
+                    <SourceBadge $bg={colors.bg} $color={colors.text}>
+                      {article.source}
+                    </SourceBadge>
+                    <span>{timeAgo(article.publishedAt)}</span>
+                  </ArticleMeta>
+                </ArticleContent>
+              </ArticleCard>
+            );
+          })}
         </ArticleGrid>
       )}
     </PageContainer>
