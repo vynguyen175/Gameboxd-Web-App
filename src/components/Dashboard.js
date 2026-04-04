@@ -47,12 +47,21 @@ const DashboardContainer = styled.div`
 
 /* ─── Hero Section ───────────────────────────────────────────────────────── */
 
+const neonPulse = keyframes`
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+`;
+
 const HeroBanner = styled.div`
   position: relative;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  height: 300px;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(0, 240, 255, 0.08) 50%, rgba(250, 204, 21, 0.05) 100%);
+  height: 340px;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.25), transparent 50%),
+    radial-gradient(ellipse at 80% 30%, rgba(0, 240, 255, 0.15), transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(255, 16, 240, 0.1), transparent 40%),
+    linear-gradient(180deg, #0a0515 0%, #050510 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,10 +73,12 @@ const HeroBanner = styled.div`
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(168, 85, 247, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(168, 85, 247, 0.06) 1px, transparent 1px);
-    background-size: 40px 40px;
-    animation: ${gridMove} 8s linear infinite;
+      linear-gradient(rgba(168, 85, 247, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168, 85, 247, 0.08) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: ${gridMove} 6s linear infinite;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
   }
 
   &::after {
@@ -76,7 +87,7 @@ const HeroBanner = styled.div`
     bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    height: 120px;
     background: linear-gradient(to top, var(--deep-space), transparent);
     pointer-events: none;
   }
@@ -595,9 +606,8 @@ function useScrollReveal() {
 }
 
 const RevealWrapper = styled.div`
-  opacity: ${p => p.$visible ? 1 : 0};
-  transform: translateY(${p => p.$visible ? '0' : '40px'});
-  transition: opacity 0.7s ease, transform 0.7s var(--spring-bounce);
+  opacity: 1;
+  animation: ${fadeUp} 0.6s ease-out both;
 `;
 
 /* ─── Auto-scroll hook ───────────────────────────────────────────────────── */
@@ -827,9 +837,9 @@ function Dashboard({ user }) {
                     <TrendingCard
                       key={game._id || game.igdbGameId || i}
                       $delay={`${i * 0.07}s`}
-                      onClick={() => navigate(`/game/${game.igdbGameId || game._id}`)}
+                      onClick={() => navigate(`/game/${game.id || game.igdbGameId || game._id}`)}
                     >
-                      <TrendingCover $image={game.coverUrl || game.cover || game.gameImageUrl}>
+                      <TrendingCover $image={game.imageUrl || game.coverUrl || game.cover || game.gameImageUrl}>
                         {!game.coverUrl && !game.cover && !game.gameImageUrl && (
                           <PlaceholderGameIcon><Gamepad2 /></PlaceholderGameIcon>
                         )}
@@ -909,9 +919,9 @@ function Dashboard({ user }) {
                   <TopRatedCard
                     key={game._id || game.igdbGameId || i}
                     $delay={`${i * 0.06}s`}
-                    onClick={() => navigate(`/game/${game.igdbGameId || game._id}`)}
+                    onClick={() => navigate(`/game/${game.id || game.igdbGameId || game._id}`)}
                   >
-                    <TopRatedCover $image={game.coverUrl || game.cover || game.gameImageUrl}>
+                    <TopRatedCover $image={game.imageUrl || game.coverUrl || game.cover || game.gameImageUrl}>
                       {!game.coverUrl && !game.cover && !game.gameImageUrl && (
                         <PlaceholderGameIcon><Gamepad2 /></PlaceholderGameIcon>
                       )}
