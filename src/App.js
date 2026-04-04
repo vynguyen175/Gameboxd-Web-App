@@ -36,6 +36,16 @@ const AppContainer = styled.div`
   transition: background 0.3s ease;
 `;
 
+const MainContent = styled.div`
+  margin-left: 64px;
+  transition: margin-left 0.3s ease;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding-bottom: 72px;
+  }
+`;
+
 function App() {
   // Load cached user immediately to avoid redirect flash
   const [user, setUser] = useState(() => {
@@ -168,6 +178,7 @@ function App() {
             <DateOfBirthPrompt user={user} onComplete={handleUserUpdate} />
           )}
           {user && <Navigation user={user} onLogout={handleLogout} />}
+          <MainContent style={user ? undefined : { marginLeft: 0, paddingBottom: 0 }}>
           <Routes>
             {/* Public routes */}
             <Route
@@ -268,6 +279,7 @@ function App() {
               element={user ? <ReviewPage user={user} /> : <Navigate to="/login" />}
             />
           </Routes>
+          </MainContent>
         </AppContainer>
       </Router>
     </ThemeProvider>

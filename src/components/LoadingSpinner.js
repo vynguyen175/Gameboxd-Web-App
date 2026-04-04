@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Gamepad2 } from 'lucide-react';
+import SkeletonLoader from './SkeletonLoader';
 
 const pulse = keyframes`
   0%, 100% { opacity: 0.4; transform: scale(1); }
@@ -103,7 +104,25 @@ const Dot = styled.span`
   margin-left: 1px;
 `;
 
-function LoadingSpinner({ text = 'Loading', compact = false }) {
+const SkeletonGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  width: 100%;
+  padding: 20px;
+`;
+
+function LoadingSpinner({ text = 'Loading', compact = false, skeleton = false }) {
+  if (skeleton) {
+    return (
+      <SkeletonGrid>
+        <SkeletonLoader type="card" />
+        <SkeletonLoader type="card" />
+        <SkeletonLoader type="card" />
+      </SkeletonGrid>
+    );
+  }
+
   return (
     <Wrapper $compact={compact}>
       <SpinnerContainer $compact={compact}>
