@@ -27,10 +27,7 @@ const slideIn = keyframes`
   to { opacity: 1; transform: translateX(0); }
 `;
 
-const breathe = keyframes`
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-`;
+/* breathe animation available via CSS class if needed */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SKELETON LOADER — always shows content structure, never black gaps
@@ -498,7 +495,7 @@ function Dashboard({ user }) {
 
   const [reviews, setReviews] = useState([]);
   const [trendingGames, setTrendingGames] = useState([]);
-  const [trendingLoading, setTrendingLoading] = useState(true);
+  const [, setTrendingLoading] = useState(true);
   const [followerCount, setFollowerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
