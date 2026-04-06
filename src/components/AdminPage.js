@@ -661,7 +661,19 @@ function AdminPage({ user }) {
   if (user.role !== 'admin') {
     return (
       <PageContainer>
-        <Message $type="error">Access denied. Admin privileges required.</Message>
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '2px solid rgba(239, 68, 68, 0.3)',
+          color: '#FCA5A5',
+          padding: '24px',
+          borderRadius: '16px',
+          textAlign: 'center',
+          fontSize: '1.1rem',
+          fontWeight: 700,
+          marginTop: '40px',
+        }}>
+          Access denied. Admin privileges required. (Your role: {user.role || 'unknown'})
+        </div>
       </PageContainer>
     );
   }
