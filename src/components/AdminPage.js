@@ -540,9 +540,9 @@ function AdminPage({ user }) {
         getAdminReviews(),
         getAdminReports().catch(() => []),
       ]);
-      setUsers(usersData);
-      setReviews(reviewsData);
-      setReports(reportsData || []);
+      setUsers(Array.isArray(usersData) ? usersData : []);
+      setReviews(Array.isArray(reviewsData) ? reviewsData : []);
+      setReports(Array.isArray(reportsData) ? reportsData : []);
     } catch (err) {
       setMessage({ type: 'error', text: 'Failed to load data' });
     } finally {
