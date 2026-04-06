@@ -547,8 +547,8 @@ function Navigation({ user, onLogout }) {
           {renderItem('/premium', Crown, 'Premium', 13)}
 
           <ThemeToggleBtn onClick={toggleTheme} $i={14}>
-            {isDark ? <Moon /> : <Sun />}
-            <LabelSpan $show={showLabel}>{isDark ? 'Dark Mode' : 'Light Mode'}</LabelSpan>
+            {isDark ? <Sun /> : <Moon />}
+            <LabelSpan $show={showLabel}>{isDark ? 'Light Mode' : 'Dark Mode'}</LabelSpan>
           </ThemeToggleBtn>
 
           <UserInfoRow onClick={() => navigate(`/profile/${user.username}`)}>
@@ -616,8 +616,8 @@ function Navigation({ user, onLogout }) {
         {isAdmin && <DrawerNavItem to="/admin"><Shield />Admin</DrawerNavItem>}
         <DrawerNavItem to="/premium"><Crown />Premium</DrawerNavItem>
         <DrawerButton onClick={toggleTheme}>
-          {isDark ? <Moon /> : <Sun />}
-          {isDark ? 'Dark Mode' : 'Light Mode'}
+          {isDark ? <Sun /> : <Moon />}
+          {isDark ? 'Light Mode' : 'Dark Mode'}
         </DrawerButton>
         <DrawerLogout onClick={handleLogout}>
           <LogOut />Logout

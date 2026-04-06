@@ -70,14 +70,14 @@ const gradientBorder = keyframes`
 
 const TierCardBase = styled.div`
   position: relative;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 24px;
   padding: 32px 24px;
   text-align: center;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
 
   &:hover {
     transform: translateY(-4px);
@@ -86,7 +86,7 @@ const TierCardBase = styled.div`
 
 const TierCardPro = styled(TierCardBase)`
   border: 2px solid transparent;
-  background-image: linear-gradient(rgba(10, 10, 15, 0.95), rgba(10, 10, 15, 0.95)),
+  background-image: linear-gradient(var(--card-background, rgba(10, 10, 15, 0.95)), var(--card-background, rgba(10, 10, 15, 0.95))),
                     linear-gradient(135deg, #FACC15, #F59E0B, #FACC15);
   background-origin: border-box;
   background-clip: padding-box, border-box;
@@ -97,7 +97,7 @@ const TierCardPro = styled(TierCardBase)`
 
 const TierCardUltimate = styled(TierCardBase)`
   border: 2px solid transparent;
-  background-image: linear-gradient(rgba(10, 10, 15, 0.95), rgba(10, 10, 15, 0.95)),
+  background-image: linear-gradient(var(--card-background, rgba(10, 10, 15, 0.95)), var(--card-background, rgba(10, 10, 15, 0.95))),
                     linear-gradient(135deg, #A855F7, #EC4899, #3B82F6, #06B6D4, #A855F7);
   background-origin: border-box;
   background-clip: padding-box, border-box;
