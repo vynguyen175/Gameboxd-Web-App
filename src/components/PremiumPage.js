@@ -68,7 +68,7 @@ const gradientBorder = keyframes`
   100% { background-position: 0% 50%; }
 `;
 
-const TierCard = styled.div`
+const TierCardBase = styled.div`
   position: relative;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
@@ -77,34 +77,37 @@ const TierCard = styled.div`
   padding: 32px 24px;
   text-align: center;
   transition: all 0.3s ease;
-
-  ${props => props.$tier === 'pro' && `
-    border: 2px solid transparent;
-    background-image: linear-gradient(rgba(10, 10, 15, 0.95), rgba(10, 10, 15, 0.95)),
-                      linear-gradient(135deg, #FACC15, #F59E0B, #FACC15);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-    transform: scale(1.05);
-  `}
-
-  ${props => props.$tier === 'ultimate' && `
-    border: 2px solid transparent;
-    background-image: linear-gradient(rgba(10, 10, 15, 0.95), rgba(10, 10, 15, 0.95)),
-                      linear-gradient(135deg, #A855F7, #EC4899, #3B82F6, #06B6D4, #A855F7);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-    background-size: 100% 100%, 300% 300%;
-    animation: ${gradientBorder} 4s ease infinite;
-  `}
-
-  ${props => props.$tier === 'free' && `
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  `}
+  border: 1px solid rgba(255, 255, 255, 0.1);
 
   &:hover {
-    transform: ${props => props.$tier === 'pro' ? 'scale(1.08)' : 'translateY(-4px)'};
+    transform: translateY(-4px);
   }
 `;
+
+const TierCardPro = styled(TierCardBase)`
+  border: 2px solid transparent;
+  background-image: linear-gradient(rgba(10, 10, 15, 0.95), rgba(10, 10, 15, 0.95)),
+                    linear-gradient(135deg, #FACC15, #F59E0B, #FACC15);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  transform: scale(1.05);
+
+  &:hover { transform: scale(1.08); }
+`;
+
+const TierCardUltimate = styled(TierCardBase)`
+  border: 2px solid transparent;
+  background-image: linear-gradient(rgba(10, 10, 15, 0.95), rgba(10, 10, 15, 0.95)),
+                    linear-gradient(135deg, #A855F7, #EC4899, #3B82F6, #06B6D4, #A855F7);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-size: 100% 100%, 300% 300%;
+  animation: ${gradientBorder} 4s ease infinite;
+
+  &:hover { transform: translateY(-6px); }
+`;
+
+/* Tier card components used directly: TierCardBase, TierCardPro, TierCardUltimate */
 
 const PopularBadge = styled.div`
   position: absolute;
@@ -281,7 +284,7 @@ function PremiumPage({ user }) {
 
       <TiersGrid>
         {/* Free Tier */}
-        <TierCard $tier="free">
+        <TierCardBase>
           <TierIcon>
             <Gamepad2 style={{ color: 'var(--text-secondary)' }} />
           </TierIcon>
@@ -301,10 +304,10 @@ function PremiumPage({ user }) {
           <TierButton $active={currentTier === 'free'} $tier="free">
             {currentTier === 'free' ? 'Current Plan' : 'Downgrade'}
           </TierButton>
-        </TierCard>
+        </TierCardBase>
 
         {/* Pro Tier */}
-        <TierCard $tier="pro">
+        <TierCardPro>
           <PopularBadge>Most Popular</PopularBadge>
           <TierIcon>
             <Star style={{ color: '#FACC15', fill: '#FACC15' }} />
@@ -325,10 +328,10 @@ function PremiumPage({ user }) {
           <TierButton $active={currentTier === 'pro'} $tier="pro">
             {currentTier === 'pro' ? 'Current Plan' : 'Coming Soon'}
           </TierButton>
-        </TierCard>
+        </TierCardPro>
 
         {/* Ultimate Tier */}
-        <TierCard $tier="ultimate">
+        <TierCardUltimate>
           <TierIcon>
             <Sparkles style={{ color: '#C084FC' }} />
           </TierIcon>
@@ -348,7 +351,7 @@ function PremiumPage({ user }) {
           <TierButton $active={currentTier === 'ultimate'} $tier="ultimate">
             {currentTier === 'ultimate' ? 'Current Plan' : 'Coming Soon'}
           </TierButton>
-        </TierCard>
+        </TierCardUltimate>
       </TiersGrid>
 
       <ComparisonNote>
