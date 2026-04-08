@@ -35,9 +35,9 @@ const slideIn = keyframes`
 
 const SkeletonBase = css`
   background: linear-gradient(90deg,
-    rgba(255,255,255,0.04) 0%,
-    rgba(255,255,255,0.08) 50%,
-    rgba(255,255,255,0.04) 100%
+    var(--glass-bg) 0%,
+    var(--glass-border) 50%,
+    var(--glass-bg) 100%
   );
   background-size: 400px 100%;
   animation: ${shimmer} 1.8s ease-in-out infinite;
@@ -240,7 +240,7 @@ const SectionRow = styled.div`
 const SectionTitle = styled.h2`
   font-size: 1.3rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
 `;
 
@@ -248,7 +248,7 @@ const SeeAll = styled(Link)`
   display: flex;
   align-items: center;
   gap: 4px;
-  color: rgba(255,255,255,0.4);
+  color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
@@ -288,10 +288,10 @@ const CarouselArrow = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(10,10,20,0.85);
+  background: var(--card-bg);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fff;
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -333,7 +333,7 @@ const GameCover = styled.div`
   overflow: hidden;
   margin-bottom: 10px;
   position: relative;
-  background: rgba(255,255,255,0.03);
+  background: var(--glass-bg);
 `;
 
 const GameCoverImg = styled.div`
@@ -371,7 +371,7 @@ const GameRatingBadge = styled.div`
 const GameName = styled.div`
   font-size: 0.85rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.85);
+  color: var(--text-primary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -397,8 +397,8 @@ const StatsBar = styled.div`
 
 const StatItem = styled.div`
   flex: 1;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 14px;
   padding: 20px 24px;
   display: flex;
@@ -407,8 +407,7 @@ const StatItem = styled.div`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: rgba(255,255,255,0.1);
+    border-color: var(--card-border-hover);
     transform: translateY(-2px);
   }
 `;
@@ -416,7 +415,7 @@ const StatItem = styled.div`
 const StatNum = styled.div`
   font-size: 1.8rem;
   font-weight: 900;
-  color: ${p => p.$color || '#fff'};
+  color: ${p => p.$color || 'var(--text-primary)'};
   line-height: 1;
   font-variant-numeric: tabular-nums;
 `;
@@ -424,7 +423,7 @@ const StatNum = styled.div`
 const StatMeta = styled.div`
   font-size: 0.78rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.35);
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 `;
@@ -446,19 +445,19 @@ const ReviewsGrid = styled.div`
 const LoadMore = styled.button`
   display: block;
   margin: 32px auto 0;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 10px;
   padding: 12px 40px;
-  color: rgba(255,255,255,0.6);
+  color: var(--text-secondary);
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
+    border-color: var(--neon-purple);
+    color: var(--text-primary);
     transform: translateY(-1px);
   }
 
@@ -480,7 +479,7 @@ const ErrorBanner = styled.div`
 const EmptyState = styled.div`
   text-align: center;
   padding: 60px 20px;
-  color: rgba(255,255,255,0.3);
+  color: var(--text-tertiary);
   font-size: 0.95rem;
   font-weight: 500;
 `;
