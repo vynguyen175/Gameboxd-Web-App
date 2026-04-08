@@ -124,13 +124,14 @@ body.light-mode {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
   background: var(--deep-space);
   color: var(--text-primary);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background 0.3s ease, color 0.3s ease;
+  letter-spacing: -0.01em;
 }
 
 /* Gaming Background Effect */
@@ -190,11 +191,15 @@ body.light-mode::after {
   background: var(--neon-cyan);
 }
 
-/* Gaming Text Styles */
+/* iOS-style Text Styles */
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 900;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
+
+h1 { font-weight: 700; letter-spacing: -0.025em; }
+h2 { font-weight: 600; letter-spacing: -0.02em; }
+h3 { font-weight: 600; letter-spacing: -0.015em; }
 
 .hero-text {
   font-size: 3rem;
@@ -204,33 +209,12 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
 }
 
-/* Glassmorphism Text — frosted glass text effect */
+/* iOS-style gradient text */
 .glass-text {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.6) 40%,
-    rgba(168, 85, 247, 0.4) 70%,
-    rgba(0, 240, 255, 0.5) 100%
-  );
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.15));
-}
-
-body.light-mode .glass-text {
-  background: linear-gradient(
-    135deg,
-    rgba(26, 26, 46, 0.95) 0%,
-    rgba(26, 26, 46, 0.7) 40%,
-    rgba(124, 58, 237, 0.6) 70%,
-    rgba(8, 145, 178, 0.7) 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 8px rgba(124, 58, 237, 0.1));
 }
 
 /* Glass Badge — frosted chip/label */
@@ -239,9 +223,9 @@ body.light-mode .glass-text {
   backdrop-filter: var(--glass-backdrop);
   -webkit-backdrop-filter: var(--glass-backdrop);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  padding: 4px 14px;
-  font-weight: 700;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-weight: 600;
   font-size: 0.8rem;
   color: var(--text-primary);
 }
@@ -251,16 +235,17 @@ button {
   cursor: pointer;
   border: none;
   font-family: inherit;
-  font-weight: 700;
-  transition: all var(--transition-fast);
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 button:hover {
-  transform: scale(1.03) translateY(-1px);
+  transform: translateY(-1px);
 }
 
 button:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
 }
 
 /* Animations */
