@@ -11,6 +11,10 @@ import {
   adminCreateUser,
   getAdminReports,
   resolveReport,
+  getAdminSupportTickets,
+  getAdminSupportTicket,
+  adminReplySupportTicket,
+  adminUpdateSupportTicket,
 } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
 import AnalyticsDashboard from './AnalyticsDashboard';
@@ -644,6 +648,11 @@ function AdminPage({ user }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newUser, setNewUser] = useState({ username: '', password: '', email: '', role: 'user' });
   const [creating, setCreating] = useState(false);
+  const [supportTickets, setSupportTickets] = useState([]);
+  const [selectedSupportTicket, setSelectedSupportTicket] = useState(null);
+  const [supportMessages, setSupportMessages] = useState([]);
+  const [supportReply, setSupportReply] = useState('');
+  const [supportFilter, setSupportFilter] = useState({ status: '', category: '' });
 
   useEffect(() => {
     fetchData();
@@ -758,6 +767,65 @@ function AdminPage({ user }) {
     }
   };
 
+  useEffect(() => {
+    if (activeTab === 'support') {
+      loadSupportTickets();
+    }
+  }, [activeTab, supportFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadSupportTickets = async () => {
+    try {
+      const data = await getAdminSupportTickets(supportFilter.status, supportFilter.category);
+      setSupportTickets(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Failed to load support tickets' });
+    }
+  };
+
+  const openSupportTicket = async (ticketId) => {
+    try {
+      const data = await getAdminSupportTicket(ticketId);
+      setSelectedSupportTicket(data.ticket);
+      setSupportMessages(Array.isArray(data.messages) ? data.messages : []);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Failed to load ticket details' });
+    }
+  };
+
+  const handleSupportReply = async () => {
+    if (!supportReply.trim() || !selectedSupportTicket) return;
+    try {
+      const msg = await adminReplySupportTicket(selectedSupportTicket._id, supportReply);
+      setSupportMessages(prev => [...prev, msg]);
+      setSupportReply('');
+      setMessage({ type: 'success', text: 'Reply sent' });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Failed to send reply' });
+    }
+  };
+
+  const handleUpdateTicketStatus = async (status) => {
+    if (!selectedSupportTicket) return;
+    try {
+      const updated = await adminUpdateSupportTicket(selectedSupportTicket._id, { status });
+      setSelectedSupportTicket(updated);
+      loadSupportTickets();
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Failed to update ticket status' });
+    }
+  };
+
+  const handleUpdateTicketPriority = async (priority) => {
+    if (!selectedSupportTicket) return;
+    try {
+      const updated = await adminUpdateSupportTicket(selectedSupportTicket._id, { priority });
+      setSelectedSupportTicket(updated);
+      loadSupportTickets();
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Failed to update ticket priority' });
+    }
+  };
+
   const filteredUsers = users.filter(u =>
     u.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -844,6 +912,9 @@ function AdminPage({ user }) {
         </Tab>
         <Tab $active={activeTab === 'ads'} onClick={() => { setActiveTab('ads'); setSearchTerm(''); }}>
           Ads
+        </Tab>
+        <Tab $active={activeTab === 'support'} onClick={() => { setActiveTab('support'); setSearchTerm(''); }}>
+          Support ({supportTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length})
         </Tab>
       </TabsContainer>
 
@@ -1021,6 +1092,204 @@ function AdminPage({ user }) {
 
       {activeTab === 'ads' && (
         <AdsManager />
+      )}
+
+      {activeTab === 'support' && (
+        <Card>
+          {!selectedSupportTicket ? (
+            <>
+              <CardHeader>
+                <CardTitle>Support Tickets ({supportTickets.length})</CardTitle>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <select
+                    value={supportFilter.status}
+                    onChange={e => setSupportFilter(f => ({ ...f, status: e.target.value }))}
+                    style={{
+                      background: 'var(--deep-space)', border: '2px solid var(--card-border)',
+                      borderRadius: '8px', padding: '8px 12px', color: 'var(--text-primary)', fontSize: '0.85rem',
+                    }}
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                  <select
+                    value={supportFilter.category}
+                    onChange={e => setSupportFilter(f => ({ ...f, category: e.target.value }))}
+                    style={{
+                      background: 'var(--deep-space)', border: '2px solid var(--card-border)',
+                      borderRadius: '8px', padding: '8px 12px', color: 'var(--text-primary)', fontSize: '0.85rem',
+                    }}
+                  >
+                    <option value="">All Categories</option>
+                    <option value="general">General</option>
+                    <option value="bug">Bug</option>
+                    <option value="account">Account</option>
+                    <option value="billing">Billing</option>
+                    <option value="feature">Feature Request</option>
+                  </select>
+                </div>
+              </CardHeader>
+              {supportTickets.length === 0 ? (
+                <EmptyState>No support tickets found</EmptyState>
+              ) : (
+                <div style={{ padding: '16px 24px' }}>
+                  {supportTickets.map(ticket => (
+                    <div
+                      key={ticket._id}
+                      onClick={() => openSupportTicket(ticket._id)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '16px', padding: '16px',
+                        background: 'var(--section-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)',
+                        marginBottom: '8px', cursor: 'pointer', transition: 'border-color 0.2s ease',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--neon-purple)'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--glass-border)'}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+                          {ticket.subject}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          From: {ticket.username || 'Unknown'} &bull; {new Date(ticket.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                        <span style={{
+                          padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
+                          textTransform: 'uppercase',
+                          background: ticket.status === 'open' ? 'rgba(34,197,94,0.2)' : ticket.status === 'in_progress' ? 'rgba(251,191,36,0.2)' : 'rgba(107,114,128,0.2)',
+                          color: ticket.status === 'open' ? '#4ADE80' : ticket.status === 'in_progress' ? '#FCD34D' : '#9CA3AF',
+                          border: `1px solid ${ticket.status === 'open' ? 'rgba(34,197,94,0.4)' : ticket.status === 'in_progress' ? 'rgba(251,191,36,0.4)' : 'rgba(107,114,128,0.4)'}`,
+                        }}>
+                          {ticket.status === 'in_progress' ? 'In Progress' : ticket.status}
+                        </span>
+                        <span style={{
+                          padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700,
+                          textTransform: 'uppercase',
+                          background: ticket.priority === 'high' ? 'rgba(239,68,68,0.2)' : ticket.priority === 'medium' ? 'rgba(251,191,36,0.2)' : 'rgba(107,114,128,0.2)',
+                          color: ticket.priority === 'high' ? '#FCA5A5' : ticket.priority === 'medium' ? '#FCD34D' : '#9CA3AF',
+                          border: `1px solid ${ticket.priority === 'high' ? 'rgba(239,68,68,0.4)' : ticket.priority === 'medium' ? 'rgba(251,191,36,0.4)' : 'rgba(107,114,128,0.4)'}`,
+                        }}>
+                          {ticket.priority || 'low'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{ padding: '24px' }}>
+              <ActionButton
+                $variant="primary"
+                onClick={() => { setSelectedSupportTicket(null); setSupportMessages([]); }}
+                style={{ marginBottom: '20px' }}
+              >
+                &larr; Back to List
+              </ActionButton>
+
+              <div style={{ marginBottom: '24px' }}>
+                <h3 style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '1.2rem', marginBottom: '12px' }}>
+                  {selectedSupportTicket.subject}
+                </h3>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '12px' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    From: <strong style={{ color: 'var(--text-primary)' }}>{selectedSupportTicket.username}</strong>
+                  </span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    Category: {selectedSupportTicket.category || 'general'}
+                  </span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    Created: {new Date(selectedSupportTicket.createdAt).toLocaleString()}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Status:</label>
+                  <select
+                    value={selectedSupportTicket.status}
+                    onChange={e => handleUpdateTicketStatus(e.target.value)}
+                    style={{
+                      background: 'var(--deep-space)', border: '2px solid var(--card-border)',
+                      borderRadius: '8px', padding: '6px 10px', color: 'var(--text-primary)', fontSize: '0.85rem',
+                    }}
+                  >
+                    <option value="open">Open</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                  <label style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>Priority:</label>
+                  <select
+                    value={selectedSupportTicket.priority || 'low'}
+                    onChange={e => handleUpdateTicketPriority(e.target.value)}
+                    style={{
+                      background: 'var(--deep-space)', border: '2px solid var(--card-border)',
+                      borderRadius: '8px', padding: '6px 10px', color: 'var(--text-primary)', fontSize: '0.85rem',
+                    }}
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{
+                background: 'var(--section-bg)', borderRadius: '12px', padding: '20px',
+                maxHeight: '400px', overflowY: 'auto', marginBottom: '16px',
+              }}>
+                {supportMessages.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '20px' }}>No messages yet</div>
+                ) : (
+                  supportMessages.map((msg, i) => (
+                    <div
+                      key={msg._id || i}
+                      style={{
+                        display: 'flex',
+                        justifyContent: msg.senderRole === 'admin' ? 'flex-end' : 'flex-start',
+                        marginBottom: '12px',
+                      }}
+                    >
+                      <div style={{
+                        maxWidth: '70%', padding: '12px 16px', borderRadius: '12px',
+                        background: msg.senderRole === 'admin'
+                          ? 'linear-gradient(135deg, var(--neon-purple), #7C3AED)'
+                          : 'var(--card-bg)',
+                        color: msg.senderRole === 'admin' ? 'white' : 'var(--text-primary)',
+                        border: msg.senderRole === 'admin' ? 'none' : '1px solid var(--card-border)',
+                      }}>
+                        <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '4px' }}>
+                          {msg.senderRole === 'admin' ? 'Admin' : msg.username || 'User'} &bull; {new Date(msg.createdAt).toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>{msg.text}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {selectedSupportTicket.status !== 'closed' && (
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <input
+                    type="text"
+                    value={supportReply}
+                    onChange={e => setSupportReply(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleSupportReply(); }}
+                    placeholder="Type your reply..."
+                    style={{
+                      flex: 1, background: 'var(--deep-space)', border: '2px solid var(--card-border)',
+                      borderRadius: '10px', padding: '12px 14px', color: 'var(--text-primary)', fontSize: '0.9rem',
+                    }}
+                  />
+                  <ActionButton $variant="primary" onClick={handleSupportReply} disabled={!supportReply.trim()}>
+                    Send
+                  </ActionButton>
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
       )}
 
       {showCreateModal && (
