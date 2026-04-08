@@ -480,10 +480,11 @@ function UserProfilePage({ user }) {
 
   const handleMessage = async () => {
     try {
-      await startConversation(username);
-      navigate('/messages');
+      const conv = await startConversation(username);
+      navigate(`/messages?conv=${conv._id}`);
     } catch (err) {
       console.error('Start conversation error:', err);
+      navigate('/messages');
     }
   };
 
@@ -560,11 +561,9 @@ function UserProfilePage({ user }) {
                 >
                   {followPending ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
                 </FollowButton>
-                {isMutualFollow && (
-                  <MessageBtn onClick={handleMessage}>
-                    <Mail /> Message
-                  </MessageBtn>
-                )}
+                <MessageBtn onClick={handleMessage}>
+                  <Mail /> Message
+                </MessageBtn>
               </ButtonsRow>
             )}
             {isOwnProfile && (
