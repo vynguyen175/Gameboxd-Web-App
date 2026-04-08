@@ -562,9 +562,18 @@ function UserProfilePage({ user }) {
                 >
                   {followPending ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
                 </FollowButton>
-                <MessageBtn onClick={handleMessage}>
-                  <Mail /> Message
-                </MessageBtn>
+                <button
+                  onClick={handleMessage}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '12px 24px', borderRadius: '12px', fontSize: '1rem',
+                    fontWeight: 700, cursor: 'pointer',
+                    background: 'rgba(0, 240, 255, 0.1)',
+                    border: '2px solid #00F0FF', color: '#00F0FF',
+                  }}
+                >
+                  <Mail style={{ width: 18, height: 18 }} /> Message
+                </button>
               </ButtonsRow>
             )}
             {isOwnProfile && (
