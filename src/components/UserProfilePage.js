@@ -154,16 +154,17 @@ const MessageBtn = styled.button`
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  background: transparent;
-  border: 2px solid var(--card-border);
-  color: var(--text-secondary);
+  background: rgba(0, 240, 255, 0.1);
+  border: 2px solid var(--neon-cyan);
+  color: var(--neon-cyan);
   transition: all 0.2s ease;
 
   svg { width: 18px; height: 18px; }
 
   &:hover {
-    border-color: var(--neon-cyan);
-    color: var(--neon-cyan);
+    background: rgba(0, 240, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 240, 255, 0.2);
   }
 `;
 
