@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
-import { Send, MessageCircle, User, ArrowLeft } from 'lucide-react';
+import { Send, MessageCircle, ArrowLeft } from 'lucide-react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   getConversations, getMessages,
-  sendMessage as sendMessageApi, markConversationRead, startConversation
+  sendMessage as sendMessageApi, markConversationRead
 } from '../services/api';
 import { getSocket } from '../services/socket';
 import LoadingSpinner from './LoadingSpinner';

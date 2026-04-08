@@ -384,8 +384,6 @@ function UserProfilePage({ user }) {
   const [activity, setActivity] = useState([]);
   const [gameStats, setGameStats] = useState({ want_to_play: 0, playing: 0, completed: 0, dropped: 0 });
   const [userLists, setUserLists] = useState([]);
-  const [isMutualFollow, setIsMutualFollow] = useState(false);
-
   const isOwnProfile = user.username === username;
 
   useEffect(() => {
@@ -410,12 +408,6 @@ function UserProfilePage({ user }) {
       setFollowers(followersData);
       setFollowing(followingData);
       setIsFollowing(myFollowingData.includes(username));
-
-      // Check mutual follow
-      const iFollowThem = myFollowingData.includes(username);
-      // Mutual: they follow me AND I follow them
-      const targetFollowersOfMe = await getFollowers(user.username).catch(() => []);
-      setIsMutualFollow(iFollowThem && targetFollowersOfMe.includes(username));
 
       // Load additional data
       const [achievementsData, listsData] = await Promise.all([
@@ -562,18 +554,9 @@ function UserProfilePage({ user }) {
                 >
                   {followPending ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
                 </FollowButton>
-                <button
-                  onClick={handleMessage}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    padding: '12px 24px', borderRadius: '12px', fontSize: '1rem',
-                    fontWeight: 700, cursor: 'pointer',
-                    background: 'rgba(0, 240, 255, 0.1)',
-                    border: '2px solid #00F0FF', color: '#00F0FF',
-                  }}
-                >
-                  <Mail style={{ width: 18, height: 18 }} /> Message
-                </button>
+                <MessageBtn onClick={handleMessage}>
+                  <Mail /> Message
+                </MessageBtn>
               </ButtonsRow>
             )}
             {isOwnProfile && (
