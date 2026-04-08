@@ -515,6 +515,124 @@ const ReportActions = styled.div`
 const USER_COLUMNS = '2fr 1fr 1fr 1fr 2fr';
 const REVIEW_COLUMNS = '2fr 2fr 0.8fr 1fr 1.5fr';
 
+function AdsManager() {
+  const [ads, setAds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('gameboxd_ads') || '[]');
+    } catch { return []; }
+  });
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ title: '', description: '', ctaText: '', url: '', imageUrl: '', active: true });
+
+  const saveAds = (updated) => {
+    setAds(updated);
+    localStorage.setItem('gameboxd_ads', JSON.stringify(updated));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!form.title || !form.url) return;
+
+    if (editing !== null) {
+      const updated = ads.map((ad, i) => i === editing ? { ...form } : ad);
+      saveAds(updated);
+      setEditing(null);
+    } else {
+      saveAds([...ads, { ...form, id: Date.now() }]);
+    }
+    setForm({ title: '', description: '', ctaText: '', url: '', imageUrl: '', active: true });
+  };
+
+  const handleEdit = (i) => {
+    setForm(ads[i]);
+    setEditing(i);
+  };
+
+  const handleDelete = (i) => {
+    saveAds(ads.filter((_, idx) => idx !== i));
+    if (editing === i) {
+      setEditing(null);
+      setForm({ title: '', description: '', ctaText: '', url: '', imageUrl: '', active: true });
+    }
+  };
+
+  const toggleActive = (i) => {
+    const updated = ads.map((ad, idx) => idx === i ? { ...ad, active: !ad.active } : ad);
+    saveAds(updated);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Ad Manager ({ads.length} ads)</CardTitle>
+      </CardHeader>
+      <div style={{ padding: '20px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+          <div>
+            <Label>Title *</Label>
+            <Input type="text" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Ad title" required />
+          </div>
+          <div>
+            <Label>Link URL *</Label>
+            <Input type="text" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="https://..." required />
+          </div>
+          <div>
+            <Label>Description</Label>
+            <Input type="text" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Short description" />
+          </div>
+          <div>
+            <Label>CTA Button Text</Label>
+            <Input type="text" value={form.ctaText} onChange={e => setForm({ ...form, ctaText: e.target.value })} placeholder="e.g. Shop Now" />
+          </div>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <Label>Image URL (optional — leave empty for text-only ad)</Label>
+            <Input type="text" value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://example.com/banner.jpg" />
+          </div>
+          <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '12px' }}>
+            <ActionButton $color="#22C55E" type="submit">{editing !== null ? 'Update Ad' : 'Add Ad'}</ActionButton>
+            {editing !== null && (
+              <ActionButton $color="var(--text-secondary)" type="button" onClick={() => { setEditing(null); setForm({ title: '', description: '', ctaText: '', url: '', imageUrl: '', active: true }); }}>
+                Cancel
+              </ActionButton>
+            )}
+          </div>
+        </form>
+
+        {ads.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>
+            No ads configured. Add your first ad above.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {ads.map((ad, i) => (
+              <div key={ad.id || i} style={{
+                display: 'flex', alignItems: 'center', gap: '16px', padding: '16px',
+                background: 'var(--section-bg)', borderRadius: '12px', border: '1px solid var(--glass-border)',
+                opacity: ad.active ? 1 : 0.5,
+              }}>
+                {ad.imageUrl && (
+                  <div style={{ width: 80, height: 50, borderRadius: 8, background: `url(${ad.imageUrl}) center/cover`, flexShrink: 0 }} />
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{ad.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ad.url}</div>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                  <ActionButton $color={ad.active ? 'var(--neon-gold)' : '#22C55E'} onClick={() => toggleActive(i)}>
+                    {ad.active ? 'Pause' : 'Enable'}
+                  </ActionButton>
+                  <ActionButton $color="var(--neon-cyan)" onClick={() => handleEdit(i)}>Edit</ActionButton>
+                  <ActionButton $color="#EF4444" onClick={() => handleDelete(i)}>Delete</ActionButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
 function AdminPage({ user }) {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
@@ -724,6 +842,9 @@ function AdminPage({ user }) {
         <Tab $active={activeTab === 'analytics'} onClick={() => { setActiveTab('analytics'); setSearchTerm(''); }}>
           Analytics
         </Tab>
+        <Tab $active={activeTab === 'ads'} onClick={() => { setActiveTab('ads'); setSearchTerm(''); }}>
+          Ads
+        </Tab>
       </TabsContainer>
 
       {(activeTab === 'users' || activeTab === 'reviews') && <Card>
@@ -896,6 +1017,10 @@ function AdminPage({ user }) {
 
       {activeTab === 'analytics' && (
         <AnalyticsDashboard />
+      )}
+
+      {activeTab === 'ads' && (
+        <AdsManager />
       )}
 
       {showCreateModal && (

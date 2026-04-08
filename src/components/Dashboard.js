@@ -7,6 +7,7 @@ import ReviewModal from './ReviewModal';
 import ReviewFilters from './ReviewFilters';
 import useAgeRestriction from '../hooks/useAgeRestriction';
 import { Star, ChevronRight, ChevronLeft, Gamepad2, ArrowRight } from 'lucide-react';
+import AdBanner from './AdBanner';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    KEYFRAMES
@@ -508,6 +509,14 @@ function Dashboard({ user }) {
   const trendingTrackRef = useRef(null);
   const topRatedTrackRef = useRef(null);
 
+  // Load ads from localStorage (set by admin)
+  const activeAds = useMemo(() => {
+    try {
+      const all = JSON.parse(localStorage.getItem('gameboxd_ads') || '[]');
+      return all.filter(ad => ad.active);
+    } catch { return []; }
+  }, []);
+
   // Auto-rotate hero
   useEffect(() => {
     if (trendingGames.length < 2) return;
@@ -678,6 +687,9 @@ function Dashboard({ user }) {
           )}
         </CarouselWrap>
       )}
+
+      {/* ═══ AD BANNER ═══ */}
+      <AdBanner ads={activeAds} placement="dashboard-top" size="medium" />
 
       {/* ═══ TOP RATED ═══ */}
       {topRated.length > 0 && (
