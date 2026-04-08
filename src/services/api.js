@@ -577,4 +577,49 @@ export const joinChatRoomByCode = async (code) => {
   return response.data;
 };
 
+// ─── Support Tickets ─────────────────────────────────────────────────────────
+
+export const createSupportTicket = async (subject, category, message) => {
+  const response = await api.post('/support/tickets', { subject, category, message });
+  return response.data;
+};
+
+export const getMySupportTickets = async () => {
+  const response = await api.get('/support/tickets');
+  return response.data;
+};
+
+export const getSupportTicket = async (ticketId) => {
+  const response = await api.get(`/support/tickets/${ticketId}`);
+  return response.data;
+};
+
+export const replySupportTicket = async (ticketId, text) => {
+  const response = await api.post(`/support/tickets/${ticketId}/messages`, { text });
+  return response.data;
+};
+
+export const getAdminSupportTickets = async (status, category) => {
+  const params = {};
+  if (status) params.status = status;
+  if (category) params.category = category;
+  const response = await api.get('/admin/support/tickets', { params, headers: getAdminHeaders() });
+  return response.data;
+};
+
+export const getAdminSupportTicket = async (ticketId) => {
+  const response = await api.get(`/admin/support/tickets/${ticketId}`, { headers: getAdminHeaders() });
+  return response.data;
+};
+
+export const adminReplySupportTicket = async (ticketId, text) => {
+  const response = await api.post(`/admin/support/tickets/${ticketId}/messages`, { text }, { headers: getAdminHeaders() });
+  return response.data;
+};
+
+export const adminUpdateSupportTicket = async (ticketId, data) => {
+  const response = await api.put(`/admin/support/tickets/${ticketId}`, data, { headers: getAdminHeaders() });
+  return response.data;
+};
+
 export default api;
