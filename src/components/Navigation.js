@@ -5,7 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import {
   Gamepad2, Home, Search, Newspaper, Users, MessageSquare, Mail,
   PenSquare, List, Clock, Heart, Settings, Shield, Crown, LogOut,
-  Sun, Moon, User, X, Menu
+  Sun, Moon, User, X, Menu, LifeBuoy
 } from 'lucide-react';
 import { getUnreadNotificationCount } from '../services/api';
 
@@ -542,11 +542,12 @@ function Navigation({ user, onLogout }) {
         </NavItems>
 
         <BottomSection>
-          {renderItem('/settings', Settings, 'Settings', 11)}
-          {isAdmin && renderItem('/admin', Shield, 'Admin', 12)}
-          {renderItem('/premium', Crown, 'Premium', 13)}
+          {renderItem('/support', LifeBuoy, 'Support', 14)}
+          {renderItem('/settings', Settings, 'Settings', 15)}
+          {isAdmin && renderItem('/admin', Shield, 'Admin', 16)}
+          {renderItem('/premium', Crown, 'Premium', 17)}
 
-          <ThemeToggleBtn onClick={toggleTheme} $i={14}>
+          <ThemeToggleBtn onClick={toggleTheme} $i={18}>
             {isDark ? <Sun /> : <Moon />}
             <LabelSpan $show={showLabel}>{isDark ? 'Light Mode' : 'Dark Mode'}</LabelSpan>
           </ThemeToggleBtn>
@@ -612,6 +613,7 @@ function Navigation({ user, onLogout }) {
 
         <DrawerSectionLabel>Account</DrawerSectionLabel>
         <DrawerNavItem to={`/profile/${user.username}`}><User />My Profile</DrawerNavItem>
+        <DrawerNavItem to="/support"><LifeBuoy />Support</DrawerNavItem>
         <DrawerNavItem to="/settings"><Settings />Settings</DrawerNavItem>
         {isAdmin && <DrawerNavItem to="/admin"><Shield />Admin</DrawerNavItem>}
         <DrawerNavItem to="/premium"><Crown />Premium</DrawerNavItem>
