@@ -28,6 +28,7 @@ import NewsPage from './components/NewsPage';
 import WishlistPage from './components/WishlistPage';
 import PremiumPage from './components/PremiumPage';
 import ChatRoomsPage from './components/ChatRoomsPage';
+import SupportPage from './components/SupportPage';
 import { connectSocket, disconnectSocket } from './services/socket';
 
 const AppContainer = styled.div`
@@ -262,6 +263,10 @@ function App() {
             <Route
               path="/chat/:roomId"
               element={user ? <ChatRoomsPage user={user} /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/support"
+              element={user ? <SupportPage user={user} /> : <Navigate to="/login" />}
             />
 
             {/* Legacy routes */}
