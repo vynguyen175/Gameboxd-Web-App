@@ -241,8 +241,20 @@ const SectionRow = styled.div`
 const SectionTitle = styled.h2`
   font-size: 1.3rem;
   font-weight: 800;
-  color: var(--text-primary);
   letter-spacing: -0.01em;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6), rgba(168,85,247,0.4), rgba(0,240,255,0.5));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.15));
+
+  body.light-mode & {
+    background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(26,26,46,0.7), rgba(124,58,237,0.6), rgba(8,145,178,0.7));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 8px rgba(124, 58, 237, 0.1));
+  }
 `;
 
 const SeeAll = styled(Link)`

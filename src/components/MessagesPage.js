@@ -19,8 +19,18 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 2rem;
   font-weight: 900;
-  color: var(--text-primary);
   margin-bottom: 24px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6), rgba(168,85,247,0.4), rgba(0,240,255,0.5));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  body.light-mode & {
+    background: linear-gradient(135deg, rgba(26,26,46,0.95), rgba(26,26,46,0.7), rgba(124,58,237,0.6), rgba(8,145,178,0.7));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 `;
 
 const MessagesLayout = styled.div`
